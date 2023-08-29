@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "391234975580",
+    "project_id": "playmyhitdev",
+    "storage_bucket": "playmyhitdev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391234975580:android:a5d3fec3b5768a35737399",
+        "android_client_info": {
+          "package_name": "com.example.playmyhit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "391234975580-rtjblje7rp260bnk5oga1c9qsru8g2bk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjuIxgWLxe-XEubTrUZ2ONawkRz_hw3tQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391234975580-rtjblje7rp260bnk5oga1c9qsru8g2bk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

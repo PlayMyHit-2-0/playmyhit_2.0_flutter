@@ -1,0 +1,4 @@
+enum ProfileVisibility {
+  public,
+  private
+}
