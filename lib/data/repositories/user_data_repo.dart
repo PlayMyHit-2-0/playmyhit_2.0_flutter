@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:playmyhit/data/models/user_model.dart';
 
 class UserDataRepo {
@@ -30,9 +31,10 @@ class UserDataRepo {
 
       // Generate an aggregated query to count the number of users with the username matching the one passed in.
       AggregateQuerySnapshot countSnapshot = await firestore.collection("users").where('username', isEqualTo: username).count().get();
-      
-      print("Ran query to check how many accounts have the username $username");
-      print("Number of accounts matching that username: ${countSnapshot.count}");
+      if(kDebugMode){
+        print("Ran query to check how many accounts have the username $username");
+        print("Number of accounts matching that username: ${countSnapshot.count}");
+      }
       // If the count is greater than 0
       if(countSnapshot.count > 0){
         return false; // Then the username is not available.
@@ -40,8 +42,10 @@ class UserDataRepo {
         return true; // Otherwise it's available.
       }
     }catch(e){
-      print("Error found while attempting to check if a username is available in the user data repo.");
-      print(e);
+      if(kDebugMode){
+        print("Error found while attempting to check if a username is available in the user data repo.");
+        print(e);
+      }
       return Future.value(false);
     }
   }
@@ -52,7 +56,9 @@ class UserDataRepo {
       await users.add(userModel.toJson());
       return Future.value(true);
     }catch (e){
-      print("Error found while attempting to add a user to firestore: ${e}");
+      if(kDebugMode){
+        print("Error found while attempting to add a user to firestore: ${e}");
+      }
       return Future.value(false);
     }
   }
@@ -78,7 +84,9 @@ class UserDataRepo {
         return Future.value(true); 
       }
     }catch(e){ // if we catch an exception 
-      print("Error from the user_data_repo.dart file: \n$e");
+      if(kDebugMode){
+        print("Error from the user_data_repo.dart file: \n$e");
+      }
       // Return false.
       return Future.value(false);
     }
