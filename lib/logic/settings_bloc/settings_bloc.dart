@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:playmyhit/data/models/settings_data_model.dart';
+import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:playmyhit/data/repositories/authentication_repo.dart';
 import 'package:playmyhit/data/repositories/settings_repo.dart';
 
@@ -30,7 +30,7 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
     on<SettingsBlocInitialEvent>((event, emit) async {
       emit(SettingsBlocLoadingState());
       try {
-        SettingsDataModel? settingsDataModel = await settingsRepository.getSettingsDataModel();
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getSettingsDataModel();
         print("Retrieved settings data model: ");
         print(settingsDataModel);
         if(settingsDataModel == null){

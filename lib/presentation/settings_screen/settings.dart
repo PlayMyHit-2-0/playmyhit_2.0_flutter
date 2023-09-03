@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
-import 'package:playmyhit/data/models/settings_data_model.dart';
+import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 
 
@@ -47,7 +47,7 @@ class SettingsState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) { 
-    SingleChildScrollView loadedView(SettingsDataModel? model){
+    SingleChildScrollView loadedView(UserProfileDataModel? model){
       print("Populating settings view with incoming settings data model.");
       print(model.toString());
       // Set the profile image from the model
@@ -239,7 +239,7 @@ class SettingsState extends State<SettingsScreen> {
               alignment: Alignment.center,
               child: TextButton(
                 onPressed: (){
-                  SettingsDataModel dataModel = SettingsDataModel(
+                  UserProfileDataModel dataModel = UserProfileDataModel(
                     allowFriendRequests: allowFriendsRequest,
                     profileIntroduction: descriptionController!.text,
                     username: BlocProvider.of<SettingsBloc>(context).settingsRepository.settingsDataModel.username,

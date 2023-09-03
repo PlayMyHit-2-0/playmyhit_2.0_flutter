@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
-import 'package:playmyhit/data/models/settings_data_model.dart';
+import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:playmyhit/data/repositories/authentication_repo.dart';
 import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/data/repositories/user_data_repo.dart';
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context) => UserDataRepo(firestore: FirebaseFirestore.instance)), // Pass the user data repo
         RepositoryProvider(create: (context) => AuthenticationRepository(auth: FirebaseAuth.instance)), // And the 
         RepositoryProvider(create: (context) => SettingsRepository(
-          settingsDataModel: SettingsDataModel(
+          settingsDataModel: UserProfileDataModel(
             username: "", 
             profileBannerImage: null, 
             profileImage: null, 

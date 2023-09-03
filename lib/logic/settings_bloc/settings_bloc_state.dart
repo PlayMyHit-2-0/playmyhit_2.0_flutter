@@ -4,7 +4,7 @@ part of 'settings_bloc.dart';
 sealed class SettingsBlocState {}
 
 final class SettingsBlocInitialState extends SettingsBlocState{
-  final SettingsDataModel? settingsDataModel;
+  final UserProfileDataModel? settingsDataModel;
   SettingsBlocInitialState({required this.settingsDataModel});
 }
 

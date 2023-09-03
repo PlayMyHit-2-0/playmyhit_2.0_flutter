@@ -4,7 +4,7 @@ part of 'settings_bloc.dart';
 sealed class SettingsBlocEvent {}
 
 final class SettingsBlocSaveEvent extends SettingsBlocEvent {
-  final SettingsDataModel settingsData;
+  final UserProfileDataModel settingsData;
   SettingsBlocSaveEvent({required this.settingsData});
 }
 

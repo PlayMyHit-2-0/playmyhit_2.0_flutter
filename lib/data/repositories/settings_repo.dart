@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
-import 'package:playmyhit/data/models/settings_data_model.dart';
+import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -14,7 +14,7 @@ enum ImageType {
 }
 
 class SettingsRepository{
-  SettingsDataModel settingsDataModel;
+  UserProfileDataModel settingsDataModel;
   FirebaseStorage storage;
   FirebaseAuth auth;
   FirebaseFirestore firestore;
@@ -57,19 +57,23 @@ class SettingsRepository{
     }
   }
 
-  Future<SettingsDataModel?> getSettingsDataModel() async{
+  Future<UserProfileDataModel?> getSettingsDataModel() async{
     const String defaultProfileImageUrl = "https://firebasestorage.googleapis.com/v0/b/playmyhitdev.appspot.com/o/assets%2Fdefault_profile_image.jpg?alt=media&token=9f8c85d4-7f44-47e5-b03d-0ad00e11e31a";
     const String defaultProfileBannerImageUrl = "https://firebasestorage.googleapis.com/v0/b/playmyhitdev.appspot.com/o/assets%2Fdefault_profile_banner.png?alt=media&token=8327ac66-978a-42c8-a228-e51e26c46155";
     try {
-      print("Getting settings data model from firestore..");
-      print("User Id: ${auth.currentUser!.uid}");
+
+      if(kDebugMode){
+        print("Getting settings data model from firestore..");
+        print("User Id: ${auth.currentUser!.uid}");
+      }
+
       return await firestore.runTransaction((transaction) async {
         DocumentReference ref = firestore.doc("/users/${auth.currentUser!.uid}");
         DocumentSnapshot snapshot = await transaction.get(ref);
         
         Map<String,dynamic> data = snapshot.data() as Map<String,dynamic>;
       
-        SettingsDataModel dataModel = SettingsDataModel(
+        UserProfileDataModel dataModel = UserProfileDataModel(
           username: data["username"], 
           profileBannerImage: await getImageFileFromPath(data["settings"]["profileBannerUrl"] ?? defaultProfileBannerImageUrl, ImageType.profileBanner), 
           profileImage: await getImageFileFromPath(auth.currentUser?.photoURL ?? defaultProfileImageUrl, ImageType.profilePicture),
@@ -82,10 +86,11 @@ class SettingsRepository{
         return dataModel;
       });
     }catch(e){
-      print("Found error while attempting to retrieve the user settings from firestore.");
-      print(e.toString());
+      if (kDebugMode) {
+        print("Found error while attempting to retrieve the user settings from firestore.");
+        print(e.toString());
+      }
       rethrow;
     }
-    return null;
   }
 }
