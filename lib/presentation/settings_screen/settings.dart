@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
 import 'package:playmyhit/data/models/user_profile_data_model.dart';
+import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 
 
@@ -20,19 +21,19 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsState extends State<SettingsScreen> {
   
-  File? profileImage;
+  String? profileImageUrl;
   String? profileDescription;
   bool editingDescription = false;
   TextEditingController? descriptionController;
   bool makeProfilePrivate = false;
   bool allowFriendsRequest = false;
   bool allowComments = false;
-  File? profileBanner;
+  String? profileBannerUrl;
 
 
   @override
   void initState() {
-    profileImage = null;
+    profileImageUrl = "";
     editingDescription = false;
     profileDescription = "";
     descriptionController = TextEditingController();
@@ -51,13 +52,13 @@ class SettingsState extends State<SettingsScreen> {
       print("Populating settings view with incoming settings data model.");
       print(model.toString());
       // Set the profile image from the model
-      if(model?.profileImage != null){
-        profileImage = model?.profileImage;
+      if(model?.profileImageUrl != null){
+        profileImageUrl = model?.profileImageUrl;
       }
 
       // Set the profile banner image from the model
-      if(model?.profileBannerImage != null){
-        profileBanner = model?.profileBannerImage;
+      if(model?.profileBannerImageUrl != null){
+        profileBannerUrl = model?.profileBannerImageUrl;
       }
 
       // Set the profile description from the model
@@ -90,14 +91,15 @@ class SettingsState extends State<SettingsScreen> {
                 Column(
                   children: [
                     const Text("Profile Image"),
-                    profileImage == null ? 
+                    profileImageUrl == null ? 
                       const Icon(Icons.image, size: 200) : 
                       CircleAvatar(
                         radius: 100,
-                        backgroundImage: Image.file(
-                          profileImage!,fit: 
-                          BoxFit.fill
-                        ).image
+                        // backgroundImage: Image.file(
+                        //   profileImage!,fit: 
+                        //   BoxFit.fill
+                        // ).image
+                        backgroundImage: Image.network(profileImageUrl!).image,
                       )
                   ],
                 ),
@@ -111,20 +113,37 @@ class SettingsState extends State<SettingsScreen> {
                   onTap: () async {
                     try{
                       XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      if(image != null){
-                        setState(() {
-                          profileImage = File(image.path);
-                        });
-                      }else{
-                        if(mounted){
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
-                        }
+
+                      if(mounted){
+                        BlocProvider.of<SettingsBloc>(context).add(
+                          SettingsBlocUpdateProfileImageEvent(
+                            profileImageFile: File(image!.path),
+                            imageType: ImageType.profilePicture
+                          )
+                        );
                       }
                     }catch(e){
+                      print(e);
                       if(mounted){
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
                       }
                     }
+                    // try{
+                    //   XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                    //   if(image != null){
+                    //     setState(() {
+                    //       profileImage = File(image.path);
+                    //     });
+                    //   }else{
+                    //     if(mounted){
+                    //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
+                    //     }
+                    //   }
+                    // }catch(e){
+                    //   if(mounted){
+                    //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
+                    //   }
+                    // }
                   },
                 )
               ]
@@ -210,16 +229,20 @@ class SettingsState extends State<SettingsScreen> {
             //   child: Icon(Icons.image, size: 200)
             // )
             MaterialBanner(
-              content: profileBanner == null ? const Icon(Icons.image, size: 200) : SizedBox(width: 200, height: 200, child: Image.file(profileBanner!,fit: BoxFit.cover)),
+              content: profileBannerUrl == null ? const Icon(Icons.image, size: 200) : SizedBox(
+                width: 200, 
+                height: 200, 
+                child: Image.network(profileBannerUrl!)
+              ),
               actions: [
                 TextButton(
                   onPressed: () async {
                     try{
                       XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
                       if(image != null){
-                        setState(() {
-                          profileBanner = File(image.path);
-                        });
+                        // setState(() {
+                        //   // profileBannerUrl =  image.path;
+                        // });
                       }else{
                         if(mounted){
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
@@ -239,22 +262,43 @@ class SettingsState extends State<SettingsScreen> {
               alignment: Alignment.center,
               child: TextButton(
                 onPressed: (){
-                  UserProfileDataModel dataModel = UserProfileDataModel(
-                    allowFriendRequests: allowFriendsRequest,
-                    profileIntroduction: descriptionController!.text,
-                    username: BlocProvider.of<SettingsBloc>(context).settingsRepository.settingsDataModel.username,
-                    profileImage: profileImage!,
-                    profileBannerImage: profileBanner!,
-                    profileVisibility: makeProfilePrivate ? ProfileVisibility.private : ProfileVisibility.public, 
-                    allowCommentsGlobal: allowComments
-                  );
-                  print(dataModel);
+                  // UserProfileDataModel dataModel = UserProfileDataModel(
+                  //   allowFriendRequests: allowFriendsRequest,
+                  //   profileIntroduction: descriptionController!.text,
+                  //   username: BlocProvider.of<SettingsBloc>(context).settingsRepository.settingsDataModel.username,
+                  //   profileImageUrl: profileImage!,
+                  //   profileBannerImage: profileBanner!,
+                  //   profileVisibility: makeProfilePrivate ? ProfileVisibility.private : ProfileVisibility.public, 
+                  //   allowCommentsGlobal: allowComments
+                  // );
+                  // print(dataModel);
                 },
                 child: const Text("Update Profile Settings"),
               ),
             )
           ]
         ),
+      );
+    }
+
+    Center uploadingView(ImageType imageType, double uploadPercentage){
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Text("Uploading ${imageType == ImageType.profilePicture ? " New Profile Picture" : " New Profile Banner"}"),
+            const SizedBox(height: 20,),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: CircularProgressIndicator(
+                value: uploadPercentage
+              ),
+            )
+          ],
+        )
       );
     }
 
@@ -282,9 +326,12 @@ class SettingsState extends State<SettingsScreen> {
                     return const Center(
                       child: CircularProgressIndicator()
                     );
-                  case SettingsBlocInitialState:
-                    var st = state as SettingsBlocInitialState;
+                  case SettingsBlocLoadedState:
+                    var st = state as SettingsBlocLoadedState;
                     return loadedView(st.settingsDataModel);
+                  case SettingsBlocUploadingImageState:
+                    var st = state as SettingsBlocUploadingImageState;
+                    return uploadingView(st.imageType, st.uploadPercentage);
                   default:
                     return const Center(
                       child: Text("Unknown State"),

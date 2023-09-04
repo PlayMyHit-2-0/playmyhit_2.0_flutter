@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context) => SettingsRepository(
           settingsDataModel: UserProfileDataModel(
             username: "", 
-            profileBannerImage: null, 
-            profileImage: null, 
+            profileBannerImageUrl: "", 
+            profileImageUrl: "", 
             profileVisibility: ProfileVisibility.public, 
             profileIntroduction: '',
             allowFriendRequests: true,

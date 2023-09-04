@@ -9,3 +9,9 @@ final class SettingsBlocSaveEvent extends SettingsBlocEvent {
 }
 
 final class SettingsBlocInitialEvent extends SettingsBlocEvent {}
+
+final class SettingsBlocUpdateProfileImageEvent extends SettingsBlocEvent {
+  final File profileImageFile;
+  final ImageType imageType;
+  SettingsBlocUpdateProfileImageEvent({required this.profileImageFile, required this.imageType});
+}
