@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:playmyhit/data/enumerations/profile_visibility.dart';
 import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:playmyhit/data/repositories/authentication_repo.dart';
 import 'package:playmyhit/data/repositories/settings_repo.dart';
@@ -49,7 +50,9 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
       }
     });
 
-    on<SettingsBlocUpdateProfileImageEvent>((event, emit) async {
+    on<SettingsBlocUpdateImageEvent>((event, emit) async {
+      ImageType imageType = event.imageType;
+
       try{
         // Create an upload task for uploading the profile image
         UploadTask? imageUploadTask = await settingsRepository.uploadImageFile(event.profileImageFile, event.imageType);
@@ -58,7 +61,7 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
         imageUploadTask?.snapshotEvents.listen((event) {
           double uploadPercentage = event.bytesTransferred / event.totalBytes;
           emit(SettingsBlocUploadingImageState(
-            imageType: ImageType.profilePicture,
+            imageType: imageType,
             uploadPercentage: uploadPercentage,
           ));
         });
@@ -68,8 +71,12 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
           // Grab the image URL from the upload
           String downloadUrl = await imageUploadTask.snapshot.ref.getDownloadURL();
 
-          // Update the profile image URL in firestore
-          await settingsRepository.updateProfileImageUrl(downloadUrl);
+          if(imageType == ImageType.profilePicture){
+            // Update the profile image URL in firestore
+            await settingsRepository.updateProfileImageUrl(downloadUrl);
+          }else{
+            await settingsRepository.updateProfileBannerUrl(downloadUrl);
+          }
 
           if(kDebugMode){
             print("Retrieving new user profile data model");
@@ -89,7 +96,7 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
         });
       }catch(e){
         if(kDebugMode){
-          print("Found an error while attempting to update the users profile image from the Settings Bloc.");
+          print("Found an error while attempting to update the ${imageType.toString()} image from the Settings Bloc.");
           print(e.toString());
         }
 
@@ -122,6 +129,96 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
       }catch(e){
         if(kDebugMode){
           print("Found an error while attempting to update the user profile description from the Settings Bloc.");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
+
+    on<SettingsBlocUpdateProfileVisibilityEvent>((event, emit) async{
+      ProfileVisibility visibility = event.visibility;
+      try{
+        // Show a loading indicator in the UI
+        emit(SettingsBlocLoadingState());
+
+        await settingsRepository.updateProfileVisibility(visibility);
+
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode){
+          print("Found an error while attempting to update the user profile visibility from the Settings Bloc.");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
+
+
+    on<SettingsBlocUpdateAllowFriendsRequestsEvent>((event, emit) async {
+      bool allowFriendRequests = event.allowFriendRequests;
+      try{
+        emit(SettingsBlocLoadingState());
+
+        await settingsRepository.updateAllowFriendRequests(allowFriendRequests);
+
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode) {
+          print("Found an error while attempting to update the allowFriendRequests from the Settings Bloc.");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
+
+    on<SettingsBlocUpdateAllowCommentsEvent>((event, emit) async {
+      bool allowComments = event.allowComments;
+      try{
+        // Show a loading indicator in the UI
+        emit(SettingsBlocLoadingState());
+
+        await settingsRepository.updateAllowComments(allowComments);
+
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode){
+          print("Found an error while attempting to update the allowComments from the Settings Bloc");
           print(e.toString());
         }
 

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,35 +50,9 @@ class SettingsState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) { 
     SingleChildScrollView loadedView(UserProfileDataModel? model){
-      print("Populating settings view with incoming settings data model.");
-      print(model.toString());
-      // // Set the profile image from the model
-      // if(model?.profileImageUrl != null){
-      //   profileImageUrl = model?.profileImageUrl;
-      // }
-
-      // // Set the profile banner image from the model
-      // if(model?.profileBannerImageUrl != null){
-      //   profileBannerUrl = model?.profileBannerImageUrl;
-      // }
-
-      // // Set the profile description from the model
-      // if(model?.profileIntroduction != null){
-      //   profileDescription = model?.profileIntroduction;
-        descriptionController.text = model?.profileIntroduction ?? "";
-      // }
-
-      // // Set the profile visibility from the model
-      // if(model?.profileVisibility == ProfileVisibility.private){
-        // makeProfilePrivate = true;
-      // }else if(model?.profileVisibility == ProfileVisibility.public){
-      //   makeProfilePrivate = false;
-      // }
-
-      // // Set wether to allow friend requests from the model
-      // // Set wether to allow global comments
-      // allowFriendsRequest = model?.allowFriendRequests ?? true;
-      // allowComments = model?.allowCommentsGlobal ?? true;
+      
+      descriptionController.text = model?.profileIntroduction ?? "";
+      
       if(model != null){
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -112,34 +87,20 @@ class SettingsState extends State<SettingsScreen> {
 
                         if(mounted && image != null){
                           BlocProvider.of<SettingsBloc>(context).add(
-                            SettingsBlocUpdateProfileImageEvent(
+                            SettingsBlocUpdateImageEvent(
                               profileImageFile: File(image!.path),
                               imageType: ImageType.profilePicture
                             )
                           );
                         }
                       }catch(e){
-                        print(e);
+                        if(kDebugMode){
+                          print(e);
+                        }
                         if(mounted){
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
                         }
                       }
-                      // try{
-                      //   XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      //   if(image != null){
-                      //     setState(() {
-                      //       profileImage = File(image.path);
-                      //     });
-                      //   }else{
-                      //     if(mounted){
-                      //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
-                      //     }
-                      //   }
-                      // }catch(e){
-                      //   if(mounted){
-                      //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
-                      //   }
-                      // }
                     },
                   )
                 ]
@@ -191,6 +152,7 @@ class SettingsState extends State<SettingsScreen> {
                     value: model.profileVisibility == ProfileVisibility.private ? true : false, 
                     onChanged: (value){
                       // Add event to Settings bloc to update the profile visibility
+                      BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateProfileVisibilityEvent(visibility: value == true ? ProfileVisibility.private : ProfileVisibility.public));
                     }
                   )
                 ],
@@ -201,9 +163,11 @@ class SettingsState extends State<SettingsScreen> {
                   Switch(
                     value: model.allowFriendRequests, 
                     onChanged: (value){
-                      // setState(() {
-                      //   allowFriendsRequest = !allowFriendsRequest;
-                      // });
+                      BlocProvider.of<SettingsBloc>(context).add(
+                        SettingsBlocUpdateAllowFriendsRequestsEvent(
+                          allowFriendRequests: value
+                        )
+                      );
                     }
                   )
                 ],
@@ -214,18 +178,16 @@ class SettingsState extends State<SettingsScreen> {
                   Switch(
                     value: model.allowCommentsGlobal, 
                     onChanged: (value){
-                      // setState(() {
-                      //   allowComments = !allowComments;
-                      // });
-                    }
+                      BlocProvider.of<SettingsBloc>(context).add(
+                        SettingsBlocUpdateAllowCommentsEvent(
+                          allowComments: value
+                        )
+                      );
+                    } 
                   )
                 ]
               ),
               const Text("Profile Banner"),
-              // const SizedBox(
-              //   width: double.infinity,
-              //   child: Icon(Icons.image, size: 200)
-              // )
               MaterialBanner(
                 content: model.profileBannerImageUrl.isEmpty ? const Icon(Icons.image, size: 200) : SizedBox(
                   width: 200, 
@@ -235,18 +197,35 @@ class SettingsState extends State<SettingsScreen> {
                 actions: [
                   TextButton(
                     onPressed: () async {
+                      // try{
+                      //   XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                      //   if(image != null){
+                          
+                      //   }else{
+                      //     if(mounted){
+                      //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
+                      //     }
+                      //   }
+                      // }catch(e){
+                      //   if(mounted){
+                      //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
+                      //   }
+                      // }
                       try{
                         XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                        if(image != null){
-                          // setState(() {
-                          //   // profileBannerUrl =  image.path;
-                          // });
-                        }else{
-                          if(mounted){
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
-                          }
+
+                        if(mounted && image != null){
+                          BlocProvider.of<SettingsBloc>(context).add(
+                            SettingsBlocUpdateImageEvent(
+                              profileImageFile: File(image!.path),
+                              imageType: ImageType.profileBanner
+                            )
+                          );
                         }
                       }catch(e){
+                        if(kDebugMode){
+                          print(e);
+                        }
                         if(mounted){
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
                         }
@@ -307,7 +286,8 @@ class SettingsState extends State<SettingsScreen> {
         child: BlocBuilder<SettingsBloc, SettingsBlocState>(
               buildWhen: (previous, current) => current.runtimeType != SettingsBlocActionState,
               builder: (context, state) {
-                print(state.runtimeType);
+                if(kDebugMode) print(state.runtimeType);
+
                 switch (state.runtimeType){
                   case SettingsBlocLoadingState:
                     return const Center(

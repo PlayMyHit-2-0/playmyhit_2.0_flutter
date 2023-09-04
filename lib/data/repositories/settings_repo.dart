@@ -129,6 +129,7 @@ class SettingsRepository{
           {
             "settings" : {
               "profileImageUrl" : newProfileImageUrl,
+              "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
               "allowComments" : settingsDataModel.allowCommentsGlobal,
               "allowFriendRequests" : settingsDataModel.allowFriendRequests,
               "profileDescription" : settingsDataModel.profileIntroduction,
@@ -148,6 +149,36 @@ class SettingsRepository{
   }
 
   /*
+    Update the profile banner url in firestore user profile
+  */
+  Future<bool> updateProfileBannerUrl(String newProfileBannerUrl) async {
+    try {
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update(
+          {
+            "settings" : {
+              "profileImageUrl" : settingsDataModel.profileImageUrl,
+              "profileBannerUrl" : newProfileBannerUrl,
+              "allowComments" : settingsDataModel.allowCommentsGlobal,
+              "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+              "profileDescription" : settingsDataModel.profileIntroduction,
+              "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+            }
+          }
+        );
+        return true;
+      }); 
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while udpdting the profile banner image url for the user profile data in firestore at the settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+
+  /*
     Update the profile description in firestore user profile
   */
   Future<bool> updateProfileDescription(String newDescription) async {
@@ -156,6 +187,7 @@ class SettingsRepository{
         await firestore.doc("users/${auth.currentUser?.uid}").update({
           "settings" : {
             "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
             "allowComments" : settingsDataModel.allowCommentsGlobal,
             "allowFriendRequests" : settingsDataModel.allowFriendRequests,
             "profileDescription" : newDescription,
@@ -167,6 +199,87 @@ class SettingsRepository{
     }catch(e){
       if(kDebugMode){
         print("There was an error while updating the profile description for the user profile data in firestore at the settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+  /*
+    Update the profile visibility in firestore user profile
+  */
+  Future<bool> updateProfileVisibility(ProfileVisibility newVisibility) async {
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
+            "allowComments" : settingsDataModel.allowCommentsGlobal,
+            "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+            "profileDescription" : settingsDataModel.profileIntroduction,
+            "profileIsPrivate" : newVisibility == ProfileVisibility.private ? true : false
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating profile visibility in firestore user profile");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+  /*
+    Update the profile allow friend requests flag in firestore user profile
+  */
+  Future<bool> updateAllowFriendRequests(bool allowFriendRequests) async {
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
+            "allowComments" : settingsDataModel.allowCommentsGlobal,
+            "allowFriendRequests" : allowFriendRequests,
+            "profileDescription" : settingsDataModel.profileIntroduction,
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating the profile allow friend requests frlag in firestore user profile from settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+  /*
+    Update the profile allow comments flag in firestore user profile
+  */
+  Future<bool> updateAllowComments(bool allowComments) async {
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
+            "allowComments" : allowComments,
+            "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+            "profileDescription" : settingsDataModel.profileIntroduction,
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating the profile allow comments frlag in firestore user profile from settings repository.");
         print(e.toString());
       }
       rethrow;
