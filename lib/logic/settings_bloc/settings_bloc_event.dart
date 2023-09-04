@@ -15,3 +15,8 @@ final class SettingsBlocUpdateProfileImageEvent extends SettingsBlocEvent {
   final ImageType imageType;
   SettingsBlocUpdateProfileImageEvent({required this.profileImageFile, required this.imageType});
 }
+
+final class SettingsBlocUpdateProfileDescriptionEvent extends SettingsBlocEvent {
+  final String newDescription;
+  SettingsBlocUpdateProfileDescriptionEvent({required this.newDescription});
+}

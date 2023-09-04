@@ -97,5 +97,36 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
         emit(SettingsBlocErrorState(error: e.toString()));
       }
     });
+
+    on<SettingsBlocUpdateProfileDescriptionEvent>((event,emit) async {
+      String newProfileDescription = event.newDescription;
+      try{
+        // Show a loading indicator in the UI
+        emit(SettingsBlocLoadingState());
+
+        // Update the description in the backend.
+        await settingsRepository.updateProfileDescription(newProfileDescription);
+        
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode){
+          print("Found an error while attempting to update the user profile description from the Settings Bloc.");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
   }
 }

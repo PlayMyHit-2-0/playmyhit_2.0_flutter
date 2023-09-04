@@ -103,6 +103,9 @@ class SettingsRepository{
           allowCommentsGlobal: data["settings"]["allowComments"]
         );
 
+        // Update the local version of the settings data model
+        settingsDataModel = dataModel;
+
         return dataModel;
       // });
     }catch(e){
@@ -113,34 +116,12 @@ class SettingsRepository{
       rethrow;
     }
   }
-
-  /*
-    Update firestore to reflect the changes in the provided UserProfileDataModel
-  */
-  // Future<bool> updateUserProfileData(UserProfileDataModel userProfileDataModel) async {
-  //   try{
-  //     // Update the profile image using firebase auth
-  //     auth.currentUser.updatePhotoURL()
-
-  //     // Run a transaction to update the data in firestore
-  //     return await firestore.runTransaction((transaction)async {
-
-  //       return true;
-  //     });
-  //   }catch(e){
-  //     if(kDebugMode){
-  //       print("Error found in the Settings Repository while updating the user profile data");
-  //       print(e.toString());
-  //     }
-  //     rethrow;
-  //   }
-  //   return Future.value(false);
-  // }
   
   /*
     Update the profile image url in firestore user profile
   */
   Future<bool> updateProfileImageUrl(String newProfileImageUrl) async {
+    
     try{
       // auth.currentUser?.updatePhotoURL(newProfileImageUrl);
       return await firestore.runTransaction((transaction) async {
@@ -160,6 +141,32 @@ class SettingsRepository{
     }catch(e){
       if(kDebugMode){
         print("There was an error while updating the profile image url for the user profile data in firestore at the settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+  /*
+    Update the profile description in firestore user profile
+  */
+  Future<bool> updateProfileDescription(String newDescription) async {
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "allowComments" : settingsDataModel.allowCommentsGlobal,
+            "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+            "profileDescription" : newDescription,
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating the profile description for the user profile data in firestore at the settings repository.");
         print(e.toString());
       }
       rethrow;
