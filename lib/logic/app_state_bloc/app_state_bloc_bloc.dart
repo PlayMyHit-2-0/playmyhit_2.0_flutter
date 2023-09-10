@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/data/models/authentication_request_response.dart';
 import 'package:playmyhit/data/models/registration_form_data_model.dart';
 import 'package:playmyhit/data/repositories/authentication_repo.dart';
@@ -18,38 +19,47 @@ class AppStateBlocBloc extends Bloc<AppStateBlocEvent, AppStateBlocState> {
 
     on<SendRecoveryEmailEvent>((event,emit) async {
       String email = event.email;
-      // print("Sending recovery email to " + email);
+      if(kDebugMode) print("Sending recovery email to $email");
       try{
         Map<String,dynamic> resp = await authRepo.sendRecoveryEmail(email);
-        print("Email Sent From The Bloc? : ${resp["success"]}");
+        if(kDebugMode) print("Email Sent From The Bloc? : ${resp["success"]}");
         if(resp["success"]){
           emit(AppStateRecoveryEmailRequestEmailSentState());
         }else{
-          print("Emitting error state from the bloc");
+          if(kDebugMode) print("Emitting error state from the bloc");
           // Handle errors and emit 
           emit(AppStateLoginErrorState(error:resp["error"]));
         }
       } on FirebaseAuthException catch(e){
-        print("Error caught in the bloc");
+        if(kDebugMode) print("Error caught in the bloc");
         emit(AppStateLoginErrorState(error: e.toString()));
       }
     });
 
     on< AttemptAuthenticationLoginEvent>((event,emit) async {
 
-      print("Recieved event for authentication login attempt in the bloc.");
+      if(kDebugMode) print("Recieved event for authentication login attempt in the bloc.");
       var username = event.username;
       var password = event.password;
       try {
         AuthenticationRequestResponse resp = await authRepo.attemptLogin(username, password);
-        print("Response from the authentication login request to the repository from the bloc:");
-        print(resp.credentials);
-        print(resp.exception);
+        if(kDebugMode){
+          print("Response from the authentication login request to the repository from the bloc:");
+          print(resp.credentials);
+          print(resp.exception);
+        }
         if(resp.exception != null){
           emit(AppStateLoginErrorState(error: resp.exception!.code));
         }else if(resp.credentials != null){
+          // Save the current user in the authRepo
           authRepo.currentUser = resp.credentials;
-          print("User has logged in successfully. Sending a logged in event to the ui from the bloc.");
+          
+          // Show a log message
+          if(kDebugMode) print ("User has logged in successfully. Sending a logged in event to the ui from the bloc.");
+          
+          // Get the user information from the settingsRepository
+
+          // Emit a logged in state so we get sent to the dashboard UI
           emit(AppStateLoggedInState(loggedInUser: authRepo.currentUser!));
         }
       } on FirebaseAuthException catch(e){
@@ -63,8 +73,10 @@ class AppStateBlocBloc extends Bloc<AppStateBlocEvent, AppStateBlocState> {
     on<AttemptAuthenticationLogoutEvent>((event, emit) async {
       try{
         Map<String,dynamic> signoutRequest = await authRepo.attemptLogout();
-        print("Back to the bloc: Here's the response from the authentication repo:");
-        print(signoutRequest);
+        if(kDebugMode){
+          print("Back to the bloc: Here's the response from the authentication repo:");
+          print(signoutRequest);
+        }
         if(signoutRequest["success"] == true){
           emit(AppStateLoggedOutState());
         }else if(signoutRequest["error"] != null){
@@ -145,8 +157,10 @@ class AppStateBlocBloc extends Bloc<AppStateBlocEvent, AppStateBlocState> {
           errors.add("The email address you provided is taken.");
         }
 
-        print("Registration Checks:");
-        print("Email available: $emailAvailable");
+        if(kDebugMode){
+          print("Registration Checks:");
+          print("Email available: $emailAvailable");
+        }
 
         if(errors.isEmpty){
           // Send then to the username selection screen

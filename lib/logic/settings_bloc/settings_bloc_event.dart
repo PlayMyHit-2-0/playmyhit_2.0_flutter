@@ -35,3 +35,18 @@ final class SettingsBlocUpdateAllowCommentsEvent extends SettingsBlocEvent {
   final bool allowComments;
   SettingsBlocUpdateAllowCommentsEvent({required this.allowComments});
 }
+
+final class SettingsBlocUpdateCountryEvent extends SettingsBlocEvent {
+  final String newCountry;
+  SettingsBlocUpdateCountryEvent({required this.newCountry});
+}
+
+final class SettingsBlocUpdateStateEvent extends SettingsBlocEvent {
+  final String? newState;
+  SettingsBlocUpdateStateEvent({required this.newState});
+}
+
+final class SettingsBlocUpdateCityEvent extends SettingsBlocEvent {
+  final String? newCity;
+  SettingsBlocUpdateCityEvent({required this.newCity});
+}

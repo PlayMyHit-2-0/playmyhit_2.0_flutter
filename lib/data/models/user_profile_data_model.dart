@@ -8,6 +8,9 @@ class UserProfileDataModel {
   final String profileIntroduction;
   final bool allowFriendRequests;
   final bool allowCommentsGlobal;
+  final String? country;
+  final String? state;
+  final String? city;
 
   UserProfileDataModel({
     required this.username, 
@@ -16,7 +19,10 @@ class UserProfileDataModel {
     required this.profileVisibility, 
     required this.profileIntroduction,
     required this.allowFriendRequests,
-    required this.allowCommentsGlobal
+    required this.allowCommentsGlobal,
+    required this.country,
+    required this.state,
+    required this.city
   });
 
   UserProfileDataModel.fromJson(Map<String, dynamic> json)
@@ -26,7 +32,10 @@ class UserProfileDataModel {
         profileVisibility = json['settings']['profileIsPrivate'] == false ? ProfileVisibility.public : ProfileVisibility.private,
         profileIntroduction = json['settings']['profileDescription'],
         allowFriendRequests = json['settings']['allowFriendRequests'],
-        allowCommentsGlobal = json['settings']['allowComments'];
+        allowCommentsGlobal = json['settings']['allowComments'],
+        country = json['settings']['country'],
+        state = json['settings']['state'],
+        city = json['settings']['city'];
 
   Map<String, dynamic> toJson() => {
         'username': username,
@@ -37,6 +46,9 @@ class UserProfileDataModel {
           'profileDescription' : profileIntroduction,
           'allowFriendRequests' : allowFriendRequests,
           'allowComments' : allowCommentsGlobal,
+          'country' : country,
+          'state' : state,
+          'city' : city
         },
   };
 
@@ -49,7 +61,10 @@ class UserProfileDataModel {
         profileVisibility: $profileVisibility,
         profileIntroduction: $profileIntroduction,
         allowFriendRequests: $allowFriendRequests,
-        allowCommentsGlobal: $allowCommentsGlobal
+        allowCommentsGlobal: $allowCommentsGlobal,
+        country: $country,
+        state: $state,
+        city: $city
     """;
   }
 }
