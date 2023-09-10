@@ -11,7 +11,7 @@ import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/data/repositories/user_data_repo.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
-import 'package:playmyhit/presentation/dashboard_screen/dashboard_screen.dart';
+import 'package:playmyhit/presentation/profile_screen/profile_screen.dart';
 import 'package:playmyhit/presentation/login_screen/login_screen.dart';
 import 'package:playmyhit/presentation/recovery_screen/recovery_screen.dart';
 import 'package:playmyhit/presentation/registration_screen/registration_screen.dart';
@@ -48,6 +48,9 @@ class MyApp extends StatelessWidget {
             profileIntroduction: '',
             allowFriendRequests: true,
             allowCommentsGlobal: true,
+            country: "",
+            state: "",
+            city: ""
           ), 
           storage: FirebaseStorage.instance,
           auth: FirebaseAuth.instance,
@@ -60,7 +63,7 @@ class MyApp extends StatelessWidget {
           BlocProvider<AppStateBlocBloc>(create: (context){
             return AppStateBlocBloc(
               authRepo: RepositoryProvider.of<AuthenticationRepository>(context),
-              userDataRepo: RepositoryProvider.of<UserDataRepo>(context)
+              userDataRepo: RepositoryProvider.of<UserDataRepo>(context),
             );
           }),
           BlocProvider<SettingsBloc>(create: (context){
@@ -99,7 +102,7 @@ class MyApp extends StatelessWidget {
             "/register" : (context) => const RegistrationScreen(),
             "/selectusername" : (context) => const UsernameSelectionScreen(),
             "/recover" : (context) => const RecoveryScreen(),
-            "/dashboard" : (context) => const DashboardScreen(),
+            "/dashboard" : (context) => const ProfileScreen(),
             "/settings" : (context) => const SettingsScreen()
           }
         ),

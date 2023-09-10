@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -66,7 +67,7 @@ class SettingsState extends State<SettingsScreen> {
                   Column(
                     children: [
                       const Text("Profile Image"),
-                      model!.profileImageUrl.isEmpty ? 
+                      model.profileImageUrl.isEmpty ? 
                         const Icon(Icons.image, size: 200) : 
                         CircleAvatar(
                           radius: 100,
@@ -88,7 +89,7 @@ class SettingsState extends State<SettingsScreen> {
                         if(mounted && image != null){
                           BlocProvider.of<SettingsBloc>(context).add(
                             SettingsBlocUpdateImageEvent(
-                              profileImageFile: File(image!.path),
+                              profileImageFile: File(image.path),
                               imageType: ImageType.profilePicture
                             )
                           );
@@ -217,7 +218,7 @@ class SettingsState extends State<SettingsScreen> {
                         if(mounted && image != null){
                           BlocProvider.of<SettingsBloc>(context).add(
                             SettingsBlocUpdateImageEvent(
-                              profileImageFile: File(image!.path),
+                              profileImageFile: File(image.path),
                               imageType: ImageType.profileBanner
                             )
                           );
@@ -235,6 +236,36 @@ class SettingsState extends State<SettingsScreen> {
                   )
                 ]
               ),
+              const SizedBox(
+                height: 20
+              ),
+              CSCPicker(
+                currentCountry: model.country,
+                currentState: model.state,
+                currentCity: model.city,
+                disabledDropdownDecoration: const BoxDecoration(
+                  color: Colors.black45
+                ),
+                dropdownDecoration: const BoxDecoration(
+                  color: Colors.black,
+                ),
+                onCountryChanged: (value){
+                  if(kDebugMode) print("Country Has Changed: $value");
+                  BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateCountryEvent(newCountry: value));
+                },
+                onStateChanged: (value){
+                  if(kDebugMode) print("State Has Changed: $value");
+                  if(value != null){
+                    BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateStateEvent(newState: value));
+                  }
+                },
+                onCityChanged: (value){
+                  if(kDebugMode) print("City Has Changed: $value");
+                  if(value != null){
+                    BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateCityEvent(newCity: value));
+                  }
+                }
+              )
             ]
           ),
         );

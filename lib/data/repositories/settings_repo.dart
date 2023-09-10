@@ -98,9 +98,12 @@ class SettingsRepository{
           profileBannerImageUrl: data["settings"]["profileBannerUrl"] ?? defaultProfileBannerImageUrl, 
           profileImageUrl: data["settings"]["profileImageUrl"] ?? defaultProfileImageUrl,
           profileVisibility: data["settings"]["profileIsPrivate"] ? ProfileVisibility.private : ProfileVisibility.public, 
-          profileIntroduction: data["settings"]["profileDescription"], 
-          allowFriendRequests: data["settings"]["allowFriendRequests"], 
-          allowCommentsGlobal: data["settings"]["allowComments"]
+          profileIntroduction: data["settings"]["profileDescription"] ?? "", 
+          allowFriendRequests: data["settings"]["allowFriendRequests"] ?? true, 
+          allowCommentsGlobal: data["settings"]["allowComments"] ?? false,
+          country: data["settings"]["country"],
+          state: data["settings"]["state"],
+          city: data["settings"]["city"]
         );
 
         // Update the local version of the settings data model
@@ -133,7 +136,10 @@ class SettingsRepository{
               "allowComments" : settingsDataModel.allowCommentsGlobal,
               "allowFriendRequests" : settingsDataModel.allowFriendRequests,
               "profileDescription" : settingsDataModel.profileIntroduction,
-              "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+              "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+              "country" : settingsDataModel.country,
+              "state" : settingsDataModel.state,
+              "city" : settingsDataModel.city
             }
           }
         );
@@ -162,7 +168,10 @@ class SettingsRepository{
               "allowComments" : settingsDataModel.allowCommentsGlobal,
               "allowFriendRequests" : settingsDataModel.allowFriendRequests,
               "profileDescription" : settingsDataModel.profileIntroduction,
-              "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+              "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+              "country" : settingsDataModel.country,
+              "state" : settingsDataModel.state,
+              "city" : settingsDataModel.city
             }
           }
         );
@@ -191,7 +200,10 @@ class SettingsRepository{
             "allowComments" : settingsDataModel.allowCommentsGlobal,
             "allowFriendRequests" : settingsDataModel.allowFriendRequests,
             "profileDescription" : newDescription,
-            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+            "country" : settingsDataModel.country,
+            "state" : settingsDataModel.state,
+            "city" : settingsDataModel.city
           }
         });
         return true;
@@ -218,7 +230,10 @@ class SettingsRepository{
             "allowComments" : settingsDataModel.allowCommentsGlobal,
             "allowFriendRequests" : settingsDataModel.allowFriendRequests,
             "profileDescription" : settingsDataModel.profileIntroduction,
-            "profileIsPrivate" : newVisibility == ProfileVisibility.private ? true : false
+            "profileIsPrivate" : newVisibility == ProfileVisibility.private ? true : false,
+            "country" : settingsDataModel.country,
+            "state" : settingsDataModel.state,
+            "city" : settingsDataModel.city
           }
         });
         return true;
@@ -245,7 +260,10 @@ class SettingsRepository{
             "allowComments" : settingsDataModel.allowCommentsGlobal,
             "allowFriendRequests" : allowFriendRequests,
             "profileDescription" : settingsDataModel.profileIntroduction,
-            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+            "country" : settingsDataModel.country,
+            "state" : settingsDataModel.state,
+            "city" : settingsDataModel.city
           }
         });
         return true;
@@ -272,7 +290,10 @@ class SettingsRepository{
             "allowComments" : allowComments,
             "allowFriendRequests" : settingsDataModel.allowFriendRequests,
             "profileDescription" : settingsDataModel.profileIntroduction,
-            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+            "country" : settingsDataModel.country,
+            "state" : settingsDataModel.state,
+            "city" : settingsDataModel.city
           }
         });
         return true;
@@ -285,4 +306,100 @@ class SettingsRepository{
       rethrow;
     }
   }
-}
+
+  /*
+    Update the profile country value in firestore
+  */
+  Future<bool> updateCountry(String country) async{
+    
+    if(kDebugMode){
+      print("Updating the country value in firestore from the settings repository with the value $country");
+    }
+
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
+            "allowComments" : settingsDataModel.allowCommentsGlobal,
+            "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+            "profileDescription" : settingsDataModel.profileIntroduction,
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+            "country" : country.isEmpty ? null : country,
+            "state" : settingsDataModel.state,
+            "city" : settingsDataModel.city
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating the country value in firestore from the settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+  /*
+    Update the profile state value in firestore
+  */
+  Future<bool> updateState(String? state) async{
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
+            "allowComments" : settingsDataModel.allowCommentsGlobal,
+            "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+            "profileDescription" : settingsDataModel.profileIntroduction,
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+            "country" : settingsDataModel.country,
+            "state" : state,
+            "city" : settingsDataModel.city
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating the state value in firestore from the settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
+
+  /*
+    Update the profile city value in firestore
+  */
+  Future<bool> updateCity(String city) async{
+    try{
+      return await firestore.runTransaction((transaction) async {
+        await firestore.doc("users/${auth.currentUser?.uid}").update({
+          "settings" : {
+            "profileImageUrl" : settingsDataModel.profileImageUrl,
+            "profileBannerUrl" : settingsDataModel.profileBannerImageUrl,
+            "allowComments" : settingsDataModel.allowCommentsGlobal,
+            "allowFriendRequests" : settingsDataModel.allowFriendRequests,
+            "profileDescription" : settingsDataModel.profileIntroduction,
+            "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
+            "country" : settingsDataModel.country,
+            "state" : settingsDataModel.state,
+            "city" : city
+          }
+        });
+        return true;
+      });
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while updating the city value in firestore from the settings repository.");
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+} 

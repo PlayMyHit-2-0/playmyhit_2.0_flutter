@@ -225,5 +225,94 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
         emit(SettingsBlocErrorState(error: e.toString()));
       }
     });
+
+    on<SettingsBlocUpdateCountryEvent>((event, emit) async {
+      String newCountry = event.newCountry;
+      try{
+        // Show a loading indicator in the UI
+        emit(SettingsBlocLoadingState());
+
+        await settingsRepository.updateCountry(newCountry);
+
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode){
+          print("Found an error while attempting to update the country from the Settings Bloc");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
+
+
+    on<SettingsBlocUpdateStateEvent>((event, emit) async {
+      String? newState = event.newState;
+      try{
+        emit(SettingsBlocLoadingState());
+
+        await settingsRepository.updateState(newState);
+
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode){
+          print("Found an error while attempting to update the user's geographic state from the Settings Bloc");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
+
+    on<SettingsBlocUpdateCityEvent>((event, emit) async {
+      String newCity = event.newCity ?? "";
+      try{
+        emit(SettingsBlocLoadingState());
+
+        await settingsRepository.updateCity(newCity);
+
+        // Load the new state into the UI
+        UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
+        if(kDebugMode){
+          print("Retrieved new user profile data model: ");
+          print(settingsDataModel);
+        }
+        if(settingsDataModel == null){
+          // Return an error
+          emit(SettingsBlocErrorState(error: "No user profile data model was found for this user."));
+        }else{
+          emit(SettingsBlocLoadedState(settingsDataModel: settingsDataModel));
+        }
+      }catch(e){
+        if(kDebugMode){
+          print("Found an error while attempting to update the city from the Settings Bloc");
+          print(e.toString());
+        }
+
+        emit(SettingsBlocErrorState(error: e.toString()));
+      }
+    });
   }
 }
