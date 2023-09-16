@@ -327,8 +327,8 @@ class SettingsRepository{
             "profileDescription" : settingsDataModel.profileIntroduction,
             "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
             "country" : country.isEmpty ? null : country,
-            "state" : settingsDataModel.state,
-            "city" : settingsDataModel.city
+            "state" : null,
+            "city" : null,
           }
         });
         return true;
@@ -358,7 +358,7 @@ class SettingsRepository{
             "profileIsPrivate" : settingsDataModel.profileVisibility == ProfileVisibility.private ? true : false,
             "country" : settingsDataModel.country,
             "state" : state,
-            "city" : settingsDataModel.city
+            "city" : null,
           }
         });
         return true;
