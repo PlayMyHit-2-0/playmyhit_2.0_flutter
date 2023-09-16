@@ -198,23 +198,8 @@ class SettingsState extends State<SettingsScreen> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      // try{
-                      //   XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      //   if(image != null){
-                          
-                      //   }else{
-                      //     if(mounted){
-                      //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
-                      //     }
-                      //   }
-                      // }catch(e){
-                      //   if(mounted){
-                      //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
-                      //   }
-                      // }
                       try{
                         XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-
                         if(mounted && image != null){
                           BlocProvider.of<SettingsBloc>(context).add(
                             SettingsBlocUpdateImageEvent(
