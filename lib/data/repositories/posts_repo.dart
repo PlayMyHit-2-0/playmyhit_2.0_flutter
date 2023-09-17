@@ -71,7 +71,6 @@ class PostsRepository {
     }
   }
 
-
   // TODO Write logic to update posts
   // TODO Write logic to delete posts
   // TODO Write logic to like posts

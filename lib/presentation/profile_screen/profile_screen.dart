@@ -1,69 +1,63 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
+import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
+import 'package:playmyhit/presentation/profile_screen/authorized_view.dart';
+import 'package:playmyhit/presentation/profile_screen/unauthorized_view.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return DashboardScreenState();
+    return ProfileScreenState();
   }
-  
 }
 
-class DashboardScreenState extends State<DashboardScreen> {
-
-
-  Widget loggedInView = const SingleChildScrollView(
-    child: Column(
-      children: [
-        Text("This is text one.")
-      ],
-    )
-  );
-
-  Widget unauthorizedView = const Center(
-    child: Text("You are not authorized to view this content. Please login to view the dashboard.")
-  );
+class ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    // Load the initial profile data from the settings bloc before building the dashboard view.
+    BlocProvider.of<SettingsBloc>(context).add(SettingsBlocInitialEvent());
+    
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    SettingsBloc settingsBloc = BlocProvider.of<SettingsBloc>(context);
+
     return BlocBuilder<AppStateBlocBloc, AppStateBlocState>(
       bloc: BlocProvider.of<AppStateBlocBloc>(context),
-      buildWhen: (previous, current) => current.runtimeType != AppStateBlocActionState,
-      // listenWhen:(previous, current) => current.runtimeType == AppStateBlocActionState,
-      
-      builder : (context,state) => BlocListener<AppStateBlocBloc, AppStateBlocState>(
-        listener: (context, state) {
-          print("Recieved a new action state from the bloc in the dadshboard view.");
-          print(state.runtimeType);
-          // Listen for state changes here.
+      buildWhen: (previous, current) => current.runtimeType != AppStateBlocActionState,      
+      builder : (buildContext,state) => BlocListener<AppStateBlocBloc, AppStateBlocState>(
+        listener: (listenContext, state) {
+          if(kDebugMode){
+            print ("Recieved a new action state from the bloc in the dadshboard view.");
+            print(state.runtimeType);
+          }
           switch(state.runtimeType){
             case AppStateLoginErrorState:
               break;
             case AppStateLoggedOutState:
-              // Kick them back to the login page
               Navigator.of(context).popUntil((route)=>route.isFirst);
               break;
-            // case AppStateNavigateToSettingsScreenState:
-            //   Navigator.of(context).pushNamed('/settings');
             default:
-              print("Recieved an unknown state: ${state.runtimeType}");
+              if(kDebugMode) print("Recieved an unknown state: ${state.runtimeType}");
               break;
           }
         },
         child: Scaffold(
           appBar: AppBar(
             leading: Container(),
-            title: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? const Text("Dashboard") : const Text("Unauthorized"),
+            title: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? const Text("My Profile") : const Text("Unauthorized"),
             actions: [
               BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? FloatingActionButton(
                 mini: true,
                 heroTag: "settingsButton",
                 child: const Icon(Icons.settings),
                 onPressed: () {
-                  // BlocProvider.of<AppStateBlocBloc>(context).add(AppStateNavigateToSettingsScreenEvent());
                   Navigator.of(context).pushNamed("/settings");
                 },
               ) : Container(),
@@ -79,7 +73,9 @@ class DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(width: 10,),
             ],
           ),
-          body: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? loggedInView : unauthorizedView
+          body: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? 
+            AuthorizedView(bloc: settingsBloc) :
+            const UnauthorizedView()
         ),
       ),
     );

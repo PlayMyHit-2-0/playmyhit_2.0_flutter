@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:csc_picker/csc_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
 import 'package:playmyhit/data/models/user_profile_data_model.dart';
+import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 
 
@@ -20,21 +23,21 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsState extends State<SettingsScreen> {
   
-  File? profileImage;
-  String? profileDescription;
+  // String? profileImageUrl;
+  // String? profileDescription;
   bool editingDescription = false;
-  TextEditingController? descriptionController;
-  bool makeProfilePrivate = false;
-  bool allowFriendsRequest = false;
-  bool allowComments = false;
-  File? profileBanner;
+  late TextEditingController descriptionController;
+  // bool makeProfilePrivate = false;
+  // bool allowFriendsRequest = false;
+  // bool allowComments = false;
+  // String? profileBannerUrl;
 
 
   @override
   void initState() {
-    profileImage = null;
-    editingDescription = false;
-    profileDescription = "";
+    // profileImageUrl = "";
+    // editingDescription = false;
+    // profileDescription = "";
     descriptionController = TextEditingController();
     BlocProvider.of<SettingsBloc>(context).add(SettingsBlocInitialEvent());
     super.initState();
@@ -48,213 +51,236 @@ class SettingsState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) { 
     SingleChildScrollView loadedView(UserProfileDataModel? model){
-      print("Populating settings view with incoming settings data model.");
-      print(model.toString());
-      // Set the profile image from the model
-      if(model?.profileImage != null){
-        profileImage = model?.profileImage;
-      }
-
-      // Set the profile banner image from the model
-      if(model?.profileBannerImage != null){
-        profileBanner = model?.profileBannerImage;
-      }
-
-      // Set the profile description from the model
-      if(model?.profileIntroduction != null){
-        profileDescription = model?.profileIntroduction;
-        descriptionController?.text = model!.profileIntroduction;
-      }
-
-      // Set the profile visibility from the model
-      if(model?.profileVisibility == ProfileVisibility.private){
-        makeProfilePrivate = true;
-      }else if(model?.profileVisibility == ProfileVisibility.public){
-        makeProfilePrivate = false;
-      }
-
-      // Set wether to allow friend requests from the model
-      // Set wether to allow global comments
-      allowFriendsRequest = model?.allowFriendRequests ?? true;
-      allowComments = model?.allowCommentsGlobal ?? true;
       
-      return SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children:[
-                Column(
-                  children: [
-                    const Text("Profile Image"),
-                    profileImage == null ? 
-                      const Icon(Icons.image, size: 200) : 
-                      CircleAvatar(
-                        radius: 100,
-                        backgroundImage: Image.file(
-                          profileImage!,fit: 
-                          BoxFit.fill
-                        ).image
-                      )
-                  ],
-                ),
-                InkWell(
-                  child: const Column(
+      descriptionController.text = model?.profileIntroduction ?? "";
+      
+      if(model != null){
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children:[
+                  Column(
                     children: [
-                      Text("Change"),
-                      Icon(Icons.upload)
-                    ]
+                      const Text("Profile Image"),
+                      model.profileImageUrl.isEmpty ? 
+                        const Icon(Icons.image, size: 200) : 
+                        CircleAvatar(
+                          radius: 100,
+                          backgroundImage: Image.network(model.profileImageUrl).image,
+                        )
+                    ],
                   ),
-                  onTap: () async {
-                    try{
-                      XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      if(image != null){
-                        setState(() {
-                          profileImage = File(image.path);
-                        });
-                      }else{
-                        if(mounted){
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
-                        }
-                      }
-                    }catch(e){
-                      if(mounted){
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
-                      }
-                    }
-                  },
-                )
-              ]
-            ),
-            const Text(
-              "Profile Description", 
-              textAlign: TextAlign.start
-            ),
-            editingDescription ? TextField(
-              controller: descriptionController,
-              maxLength: 200,
-              showCursor: true,
-              maxLines: 5,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.description),
-                label: Text("Profile Description")
-              ),
-            ) : Text(
-              descriptionController?.text ?? "Provide a description", 
-              textAlign: TextAlign.start
-            ),
-            !editingDescription ? TextButton.icon(
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Description"),
-              onPressed: (){
-                setState(() {
-                  editingDescription = true;
-                });
-              },
-            ) : TextButton.icon(
-              icon: const Icon(Icons.done),
-              label: const Text("Done Editing"),
-              onPressed: (){
-                setState((){
-                  profileDescription = descriptionController?.text;
-                  editingDescription = false;
+                  InkWell(
+                    child: const Column(
+                      children: [
+                        Text("Change"),
+                        Icon(Icons.upload)
+                      ]
+                    ),
+                    onTap: () async {
+                      try{
+                        XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-                });
-              },
-            ),
-            Row(
-              children: [
-                const Text("Make Profile Private"),
-                Switch(
-                  value: makeProfilePrivate, 
-                  onChanged: (value){
-                    setState(() {
-                      makeProfilePrivate = !makeProfilePrivate;
-                    });
-                  }
-                )
-              ],
-            ),
-            Row(
-              children: [
-                const Text("Allow Friend Requests"),
-                Switch(
-                  value: allowFriendsRequest, 
-                  onChanged: (value){
-                    setState(() {
-                      allowFriendsRequest = !allowFriendsRequest;
-                    });
-                  }
-                )
-              ],
-            ),
-            Row(
-              children: [
-                const Text("Allow Comments"),
-                Switch(
-                  value: allowComments, 
-                  onChanged: (value){
-                    setState(() {
-                      allowComments = !allowComments;
-                    });
-                  }
-                )
-              ]
-            ),
-            const Text("Profile Banner"),
-            // const SizedBox(
-            //   width: double.infinity,
-            //   child: Icon(Icons.image, size: 200)
-            // )
-            MaterialBanner(
-              content: profileBanner == null ? const Icon(Icons.image, size: 200) : SizedBox(width: 200, height: 200, child: Image.file(profileBanner!,fit: BoxFit.cover)),
-              actions: [
-                TextButton(
-                  onPressed: () async {
-                    try{
-                      XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      if(image != null){
-                        setState(() {
-                          profileBanner = File(image.path);
-                        });
-                      }else{
+                        if(mounted && image != null){
+                          BlocProvider.of<SettingsBloc>(context).add(
+                            SettingsBlocUpdateImageEvent(
+                              profileImageFile: File(image.path),
+                              imageType: ImageType.profilePicture
+                            )
+                          );
+                        }
+                      }catch(e){
+                        if(kDebugMode){
+                          print(e);
+                        }
                         if(mounted){
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The image could not be loaded."),));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
                         }
                       }
-                    }catch(e){
-                      if(mounted){
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
-                      }
-                    }
-                  }, 
-                  child: const Text("Change Profile Banner")
-                )
-              ]
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: TextButton(
+                    },
+                  )
+                ]
+              ),
+              const Text(
+                "Profile Description", 
+                textAlign: TextAlign.start
+              ),
+              editingDescription ? TextField(
+                controller: descriptionController,
+                maxLength: 200,
+                showCursor: true,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.description),
+                  label: Text("Profile Description")
+                ),
+              ) : Text(
+                descriptionController.text.isEmpty ? "Provide a description" : descriptionController.text, 
+                textAlign: TextAlign.start
+              ),
+              !editingDescription ? TextButton.icon(
+                icon: const Icon(Icons.edit),
+                label: const Text("Edit Description"),
                 onPressed: (){
-                  UserProfileDataModel dataModel = UserProfileDataModel(
-                    allowFriendRequests: allowFriendsRequest,
-                    profileIntroduction: descriptionController!.text,
-                    username: BlocProvider.of<SettingsBloc>(context).settingsRepository.settingsDataModel.username,
-                    profileImage: profileImage!,
-                    profileBannerImage: profileBanner!,
-                    profileVisibility: makeProfilePrivate ? ProfileVisibility.private : ProfileVisibility.public, 
-                    allowCommentsGlobal: allowComments
-                  );
-                  print(dataModel);
+                  setState(() {
+                    editingDescription = true;
+                  });
                 },
-                child: const Text("Update Profile Settings"),
+              ) : TextButton.icon(
+                icon: const Icon(Icons.done),
+                label: const Text("Done Editing"),
+                onPressed: (){
+                  setState((){
+                    editingDescription = false;
+                  });
+
+                  BlocProvider.of<SettingsBloc>(context).add(
+                    SettingsBlocUpdateProfileDescriptionEvent(
+                      newDescription: descriptionController.text
+                    )
+                  );
+                },
+              ),
+              Row(
+                children: [
+                  const Text("Make Profile Private"),
+                  Switch(
+                    value: model.profileVisibility == ProfileVisibility.private ? true : false, 
+                    onChanged: (value){
+                      // Add event to Settings bloc to update the profile visibility
+                      BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateProfileVisibilityEvent(visibility: value == true ? ProfileVisibility.private : ProfileVisibility.public));
+                    }
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  const Text("Allow Friend Requests"),
+                  Switch(
+                    value: model.allowFriendRequests, 
+                    onChanged: (value){
+                      BlocProvider.of<SettingsBloc>(context).add(
+                        SettingsBlocUpdateAllowFriendsRequestsEvent(
+                          allowFriendRequests: value
+                        )
+                      );
+                    }
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  const Text("Allow Comments"),
+                  Switch(
+                    value: model.allowCommentsGlobal, 
+                    onChanged: (value){
+                      BlocProvider.of<SettingsBloc>(context).add(
+                        SettingsBlocUpdateAllowCommentsEvent(
+                          allowComments: value
+                        )
+                      );
+                    } 
+                  )
+                ]
+              ),
+              const Text("Profile Banner"),
+              MaterialBanner(
+                content: model.profileBannerImageUrl.isEmpty ? const Icon(Icons.image, size: 200) : SizedBox(
+                  width: 200, 
+                  height: 200, 
+                  child: Image.network(model.profileBannerImageUrl)
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      try{
+                        XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        if(mounted && image != null){
+                          BlocProvider.of<SettingsBloc>(context).add(
+                            SettingsBlocUpdateImageEvent(
+                              profileImageFile: File(image.path),
+                              imageType: ImageType.profileBanner
+                            )
+                          );
+                        }
+                      }catch(e){
+                        if(kDebugMode){
+                          print(e);
+                        }
+                        if(mounted){
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("That image is corrupted. Try another image."),));
+                        }
+                      }
+                    }, 
+                    child: const Text("Change Profile Banner")
+                  )
+                ]
+              ),
+              const SizedBox(
+                height: 20
+              ),
+              CSCPicker(
+                currentCountry: model.country,
+                currentState: model.state,
+                currentCity: model.city,
+                disabledDropdownDecoration: const BoxDecoration(
+                  color: Colors.black45
+                ),
+                dropdownDecoration: const BoxDecoration(
+                  color: Colors.black,
+                ),
+                onCountryChanged: (value){
+                  if(kDebugMode) print("Country Has Changed: $value");
+                  BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateCountryEvent(newCountry: value));
+                },
+                onStateChanged: (value){
+                  if(kDebugMode) print("State Has Changed: $value");
+                  if(value != null){
+                    BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateStateEvent(newState: value));
+                  }
+                },
+                onCityChanged: (value){
+                  if(kDebugMode) print("City Has Changed: $value");
+                  if(value != null){
+                    BlocProvider.of<SettingsBloc>(context).add(SettingsBlocUpdateCityEvent(newCity: value));
+                  }
+                }
+              )
+            ]
+          ),
+        );
+      }else{
+        return const SingleChildScrollView(
+          child: Center(
+            child: Text("Model was not loaded.")
+          )
+        );
+      }
+    }
+
+    Center uploadingView(ImageType imageType, double uploadPercentage){
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Text("Uploading ${imageType == ImageType.profilePicture ? " New Profile Picture" : " New Profile Banner"}"),
+            const SizedBox(height: 20,),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: CircularProgressIndicator(
+                value: uploadPercentage
               ),
             )
-          ]
-        ),
+          ],
+        )
       );
     }
 
@@ -276,15 +302,19 @@ class SettingsState extends State<SettingsScreen> {
         child: BlocBuilder<SettingsBloc, SettingsBlocState>(
               buildWhen: (previous, current) => current.runtimeType != SettingsBlocActionState,
               builder: (context, state) {
-                print(state.runtimeType);
+                if(kDebugMode) print(state.runtimeType);
+
                 switch (state.runtimeType){
                   case SettingsBlocLoadingState:
                     return const Center(
                       child: CircularProgressIndicator()
                     );
-                  case SettingsBlocInitialState:
-                    var st = state as SettingsBlocInitialState;
+                  case SettingsBlocLoadedState:
+                    var st = state as SettingsBlocLoadedState;
                     return loadedView(st.settingsDataModel);
+                  case SettingsBlocUploadingImageState:
+                    var st = state as SettingsBlocUploadingImageState;
+                    return uploadingView(st.imageType, st.uploadPercentage);
                   default:
                     return const Center(
                       child: Text("Unknown State"),
