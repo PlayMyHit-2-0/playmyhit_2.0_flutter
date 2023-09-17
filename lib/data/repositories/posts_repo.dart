@@ -71,7 +71,26 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to update posts
+  // Write logic to update posts
+  Future<bool> updatePost(Post post){
+    try {
+      if(auth.currentUser?.uid != null){
+        CollectionReference ref = firestore.collection("users/${auth.currentUser?.uid}/posts");
+        return firestore.runTransaction((transaction) async {
+          await ref.doc(post.postId).update(post.toJson());
+          return true;
+        });
+      }else{
+        throw Exception("You must be logged in to update a post.");
+      }
+    }catch(e){
+      if(kDebugMode){
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
   // TODO Write logic to delete posts
   // TODO Write logic to like posts
   // TODO Write logic to comment on a post
