@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:playmyhit/data/models/post.dart';
@@ -8,7 +9,8 @@ import 'package:playmyhit/data/models/post.dart';
 class PostsRepository {
   FirebaseFirestore firestore;
   FirebaseStorage storage;
-  PostsRepository({required this.firestore, required this.storage});
+  FirebaseAuth auth;
+  PostsRepository({required this.firestore, required this.storage, required this.auth});
   StreamSubscription? currentPostsListener;
   List<Post>? posts;
 
@@ -51,7 +53,24 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to create posts
+  // Write logic to create posts
+  Future<bool> createPost(Post post) async {
+    try{
+      if(auth.currentUser?.uid != null){
+        CollectionReference ref = firestore.collection("users/${auth.currentUser?.uid}/posts");
+        await ref.add(post.toJson());
+        return true;
+      }else{
+        throw Exception("You need to login to make a new post.");
+      }
+    }catch(e){
+      if(kDebugMode){
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
   // TODO Write logic to update posts
   // TODO Write logic to delete posts
   // TODO Write logic to like posts
