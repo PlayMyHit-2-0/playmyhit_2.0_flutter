@@ -91,7 +91,23 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to delete posts
+  // Write logic to delete posts
+  Future<bool> deleteExistingPost(Post post) async {
+    try {
+      if(auth.currentUser?.uid != null){
+        await firestore.collection("users/${auth.currentUser?.uid}/posts").doc(post.postId).delete();
+        return true;
+      }else{
+        throw Exception("You must be logged in to delete an existing post.");
+      }
+    }catch(e){
+      if(kDebugMode){
+        print(e.toString());
+      }
+      rethrow;
+    }
+  }
+
   // TODO Write logic to like posts
   // TODO Write logic to comment on a post
   // TODO Write logic to edit a comment on a post
