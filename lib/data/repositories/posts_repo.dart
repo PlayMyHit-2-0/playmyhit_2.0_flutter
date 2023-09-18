@@ -153,6 +153,25 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to edit a comment on a post
+  //Write logic to edit a comment on a post
+  Future<bool> editComment(Post post, Comment comment) {
+    try {
+      if(auth.currentUser?.uid != null){
+        DocumentReference commentDocReference = firestore.doc("users/${post.postOwnerId}/comments/${comment.commentId}");
+        return firestore.runTransaction((transaction) async {
+          await commentDocReference.update(comment.toJson());
+          return true;
+        });
+      }else{
+        throw Exception("You must be logged in to edit a comment on a post.");
+      }
+    } catch(e){
+      if(kDebugMode){
+        print("There was an error while attempting to edit a comment from the posts repository.");
+      }
+      rethrow;
+    }
+  }
+
   // TODO Write logic to delete a post comment
 }
