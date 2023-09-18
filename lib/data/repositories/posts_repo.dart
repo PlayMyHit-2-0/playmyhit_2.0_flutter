@@ -108,7 +108,30 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to like posts
+  // Write logic to like posts
+  Future<bool> likeUnlikePost(Post post,bool isLiked){
+    try{
+      if(auth.currentUser?.uid != null){
+        DocumentReference ref = firestore.doc("users/${post.postOwnerId}/posts/${post.postId}/likes/${auth.currentUser?.uid}");
+        return firestore.runTransaction((transaction) async {
+          if(isLiked){
+            ref.set(false);
+          }else{  
+            ref.set(true);
+          }
+          return true;
+        });
+      }else {
+        throw Exception("You have to be logged in to like a post.");
+      }
+    }catch(e){
+      if(kDebugMode){
+        print("There was an error while liking the post.");
+      }
+      rethrow;
+    }
+  }
+
   // TODO Write logic to comment on a post
   // TODO Write logic to edit a comment on a post
   // TODO Write logic to delete a post comment
