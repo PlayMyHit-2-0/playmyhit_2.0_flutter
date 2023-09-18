@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:playmyhit/data/models/comment.dart';
 import 'package:playmyhit/data/models/post.dart';
 
 class PostsRepository {
@@ -132,7 +133,26 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to comment on a post
+  // Write logic to comment on a post
+  Future<bool> leaveComment(Post post, Comment comment){
+    try {
+      if(auth.currentUser?.uid != null){
+        CollectionReference postsCollectionRef = firestore.collection("users/${post.postOwnerId}/posts/${post.postId}/comments/");
+        return firestore.runTransaction((transaction) async {
+          await postsCollectionRef.add(comment.toJson());
+          return true;
+        });
+      }else{
+        throw Exception("You must be logged in to leave a comment.");
+      }
+    } catch (e) {
+      if(kDebugMode){
+        print("There was an error while leaving a comment in the posts repository.");
+      }
+      rethrow;
+    }
+  }
+
   // TODO Write logic to edit a comment on a post
   // TODO Write logic to delete a post comment
 }
