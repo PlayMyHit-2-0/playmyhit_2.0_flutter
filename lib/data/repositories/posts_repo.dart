@@ -158,10 +158,14 @@ class PostsRepository {
     try {
       if(auth.currentUser?.uid != null){
         DocumentReference commentDocReference = firestore.doc("users/${post.postOwnerId}/comments/${comment.commentId}");
-        return firestore.runTransaction((transaction) async {
-          await commentDocReference.update(comment.toJson());
-          return true;
-        });
+        if(comment.commentOwnerId != auth.currentUser?.uid){
+          throw Exception("You are not the owner of the comment you're trying to delete.");
+        }else{
+          return firestore.runTransaction((transaction) async {
+            await commentDocReference.update(comment.toJson());
+            return true;
+          });
+        }
       }else{
         throw Exception("You must be logged in to edit a comment on a post.");
       }
@@ -173,5 +177,28 @@ class PostsRepository {
     }
   }
 
-  // TODO Write logic to delete a post comment
+  //Write logic to delete a post comment
+  Future<bool> deleteComment(Post post, Comment comment) {
+    try { 
+      if(auth.currentUser?.uid != null){
+        if(comment.commentOwnerId != auth.currentUser?.uid){
+          throw Exception("You cannot delete comments you do not own.");
+        }else{
+          DocumentReference commentDocReference = firestore.doc("users/${post.postOwnerId}/comments/${comment.commentId}");
+          return firestore.runTransaction((transaction) async {
+            await commentDocReference.delete();
+            return true;
+          });
+        }
+      }else{
+        throw Exception("You must be logged in to delete a comment on a post.");
+      }
+    } catch(e){
+      if(kDebugMode){
+        print("There was an error while attempting to delete a post comment from the posts repository.");
+      }
+      rethrow;
+    }
+  }
+
 }
