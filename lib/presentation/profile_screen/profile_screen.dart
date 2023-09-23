@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 import 'package:playmyhit/presentation/profile_screen/authorized_view.dart';
 import 'package:playmyhit/presentation/profile_screen/unauthorized_view.dart';
@@ -75,7 +76,24 @@ class ProfileScreenState extends State<ProfileScreen> {
           ),
           body: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? 
             AuthorizedView(bloc: settingsBloc) :
-            const UnauthorizedView()
+            const UnauthorizedView(),
+          bottomNavigationBar: NavigationBar(
+            destinations: [
+              TextButton.icon(
+                onPressed: (){
+                  BlocProvider.of<PostBloc>(context).add(NewPostEvent());
+                  Navigator.of(context).pushNamed("/post");
+                }, 
+                icon: const Icon(Icons.post_add),
+                label: const Text("New Post"),
+              ),
+              TextButton.icon(
+                onPressed: (){}, 
+                icon: const Icon(Icons.messenger),
+                label : const Text("Messages")
+              )
+            ],
+          ),
         ),
       ),
     );

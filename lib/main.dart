@@ -7,10 +7,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
 import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:playmyhit/data/repositories/authentication_repo.dart';
+import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/data/repositories/user_data_repo.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
+import 'package:playmyhit/presentation/post_screen/post_screen.dart';
 import 'package:playmyhit/presentation/profile_screen/profile_screen.dart';
 import 'package:playmyhit/presentation/login_screen/login_screen.dart';
 import 'package:playmyhit/presentation/recovery_screen/recovery_screen.dart';
@@ -55,8 +59,12 @@ class MyApp extends StatelessWidget {
           storage: FirebaseStorage.instance,
           auth: FirebaseAuth.instance,
           firestore: FirebaseFirestore.instance
-        )
-      )
+        )),
+        RepositoryProvider(create: (context) => PostsRepository(
+          firestore: FirebaseFirestore.instance, 
+          storage: FirebaseStorage.instance, 
+          auth: FirebaseAuth.instance
+        ))
       ],
       child: MultiBlocProvider(
         providers : [
@@ -71,7 +79,15 @@ class MyApp extends StatelessWidget {
               authRepo: RepositoryProvider.of<AuthenticationRepository>(context),
               settingsRepository: RepositoryProvider.of<SettingsRepository>(context),
             );
-          })
+          }),
+          BlocProvider<ProfileBloc>(create: (context) {
+            return ProfileBloc(
+              postsRepository: RepositoryProvider.of<PostsRepository>(context),
+            );
+          }),
+          BlocProvider<PostBloc>(create:(context) => PostBloc(
+            postsRepository: RepositoryProvider.of<PostsRepository>(context),
+          ))
         ],
         child: MaterialApp(
           title: 'PlayMyHit',
@@ -103,7 +119,8 @@ class MyApp extends StatelessWidget {
             "/selectusername" : (context) => const UsernameSelectionScreen(),
             "/recover" : (context) => const RecoveryScreen(),
             "/dashboard" : (context) => const ProfileScreen(),
-            "/settings" : (context) => const SettingsScreen()
+            "/settings" : (context) => const SettingsScreen(),
+            "/post" : (context) => const PostScreen(post: null),
           }
         ),
       )
