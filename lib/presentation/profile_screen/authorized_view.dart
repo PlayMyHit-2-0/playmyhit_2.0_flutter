@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
+import 'package:playmyhit/presentation/profile_screen/post_card/post_card.dart';
 import 'package:playmyhit/presentation/profile_screen/profile_banner.dart';
 import 'package:playmyhit/presentation/profile_screen/profile_info.dart';
 
@@ -73,9 +72,10 @@ class AuthorizedViewState extends State<AuthorizedView> {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: snapshot.data?.length,
-                              itemBuilder: (context, index) => ListTile(
-                                title: Text(snapshot.data?[index].postText ?? "No Title") 
-                              ),
+                              // itemBuilder: (context, index) => ListTile(
+                              //   title: Text(snapshot.data?[index].postText ?? "No Title") 
+                              // ),
+                              itemBuilder:(context, index) => PostCard(post: snapshot.data![index]),
                             );
                           }else{
                             return ListView(

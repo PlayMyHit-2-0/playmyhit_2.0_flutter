@@ -57,19 +57,21 @@ class ProfileScreenState extends State<ProfileScreen> {
               BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? FloatingActionButton(
                 mini: true,
                 heroTag: "settingsButton",
-                child: const Icon(Icons.settings),
+                backgroundColor: Colors.redAccent,
                 onPressed: () {
                   Navigator.of(context).pushNamed("/settings");
                 },
+                child: const Icon(Icons.settings),
               ) : Container(),
               const SizedBox(width: 10,),
               BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? FloatingActionButton(
                 mini: true,
                 heroTag: "logoutButton",
-                child: const Icon(Icons.exit_to_app),
+                backgroundColor: Colors.redAccent,
                 onPressed: (){
                   BlocProvider.of<AppStateBlocBloc>(context).add(AppStateAttemptSignOutEvent());
                 },
+                child: const Icon(Icons.exit_to_app),
               ) : Container(),
               const SizedBox(width: 10,),
             ],

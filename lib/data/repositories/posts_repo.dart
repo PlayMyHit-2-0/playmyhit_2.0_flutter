@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
-import 'package:playmyhit/data/models/comment.dart';
 import 'package:playmyhit/data/models/post.dart';
 
 class PostsRepository {
@@ -28,13 +25,22 @@ class PostsRepository {
   StreamSubscription? postsStreamSubscription;
 
   Stream<List<Post>> get postsStream => firestore.collection("users/$profileUid/posts")
+  .orderBy('post_created_at')
   .snapshots()
   .map((snapshot){
     List posts = snapshot.docs.map((element) {
       return Post.fromJson(element.data());
     }).toList();
-    return List<Post>.from(posts);
+    return List<Post>.from(posts.reversed);
   });
 
   Future<DocumentReference> savePost(Post post) => firestore.collection("users/${auth.currentUser?.uid}/posts").add(post.toJson());
+
+  Future<String> getPostOwnerUsername(String postOwnerId) async => 
+    (await firestore.doc("users/$postOwnerId").get())
+    .data()?["username"];
+
+  Future<Map<String,dynamic>> getPostOwnerSettings(String postOwnerId) async =>
+    (await firestore.doc("users/$postOwnerId").get())
+    .data() as Map<String,dynamic>;
 }

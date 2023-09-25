@@ -61,6 +61,7 @@ class PostScreen extends StatelessWidget {
             child: Row(
               children: [
                 FloatingActionButton(
+                  heroTag: "AddPhotoButton",
                   backgroundColor: Colors.red,
                   mini: true,
                   onPressed: (){
@@ -70,6 +71,7 @@ class PostScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 FloatingActionButton(
+                  heroTag: "AddVideoButton",
                   backgroundColor: Colors.red,
                   mini: true,
                   onPressed: () {
@@ -88,6 +90,7 @@ class PostScreen extends StatelessWidget {
                 ),
                 const Spacer(),
                 FloatingActionButton(
+                  heroTag: "SubmitPostButton",
                   backgroundColor: Colors.redAccent,
                   mini: true,
                   child: const Icon(Icons.post_add),

@@ -29,26 +29,24 @@ class Post {
     "post_created_at" : postCreatedAt
   };
 
-  // Post.fromJson(Map<String, dynamic> json)
-  //     : postId = json['post_id'],
-  //       postOwnerId = json['post_owner_id'],
-  //       postText = json['post_text'],
-  //       postImageUrl = json['post_image_url'],
-  //       postAttachments = List<Attachment>.from(jsonDecode(json['attachments'])),
-  //       postCreatedAt = json['post_created_at'];
+  Post.fromJson(Map<String, dynamic> json)
+      : postId = json['post_id'],
+        postOwnerId = json['post_owner_id'],
+        postText = json['post_text'],
+        postImageUrl = json['post_image_url'],
+        postAttachments = json['attachments'] != null ? List<Attachment>.from(jsonDecode(json['attachments'])) : [],
+        postCreatedAt = json['post_created_at'];
 
-  static fromJson(Map<String,dynamic> j){
+  // static fromJson(Map<String,dynamic> j){
 
-    // Iterable<Attachment> attachments = json.decode(j['attachments']);
-    // List<Attachment> att = List<Attachment>.from(attachments);
-    Post p = Post(
-      postId: j['post_id'], 
-      postOwnerId: j['post_owner_id'], 
-      postText: j['post_text'], 
-      postImageUrl: j['post_image_url'], 
-      postAttachments: [], 
-      postCreatedAt: j['post_created_at'],
-    );
-    return p;
-  }
+  //   Post p = Post(
+  //     postId: j['post_id'], 
+  //     postOwnerId: j['post_owner_id'], 
+  //     postText: j['post_text'], 
+  //     postImageUrl: j['post_image_url'], 
+  //     postAttachments: j['attachments'] != null ? List<Attachment>.from(jsonDecode(j['attachments'])) : [], 
+  //     postCreatedAt: j['post_created_at'],
+  //   );
+  //   return p;
+  // }
 }
