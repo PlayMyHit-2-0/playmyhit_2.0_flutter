@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:playmyhit/data/models/post.dart';
 
 class PostsRepository {
@@ -14,25 +16,18 @@ class PostsRepository {
   }
   
   void dispose(){
-    postsStreamController?.close();
-    postsStreamSubscription?.cancel();
   }
 
-
-  // Stream for getting posts by the profile uid
-  StreamController<Post>? postsStreamController = StreamController<Post>();
   String? profileUid;
-  StreamSubscription? postsStreamSubscription;
-
   Stream<List<Post>> get postsStream => firestore.collection("users/$profileUid/posts")
-  .orderBy('post_created_at')
-  .snapshots()
-  .map((snapshot){
-    List posts = snapshot.docs.map((element) {
-      return Post.fromJson(element.data());
-    }).toList();
-    return List<Post>.from(posts.reversed);
-  });
+    .orderBy('post_created_at')
+    .snapshots()
+    .map((snapshot){
+      List posts = snapshot.docs.map((element) {
+        return Post.fromJson(element.data());
+      }).toList();
+      return List<Post>.from(posts.reversed);
+    });
 
   Future<DocumentReference> savePost(Post post) => firestore.collection("users/${auth.currentUser?.uid}/posts").add(post.toJson());
 
@@ -43,4 +38,31 @@ class PostsRepository {
   Future<Map<String,dynamic>> getPostOwnerSettings(String postOwnerId) async =>
     (await firestore.doc("users/$postOwnerId").get())
     .data() as Map<String,dynamic>;
+  
+  /*
+    Stream of TaskSnapshots for uploading a file
+  */
+  Stream<dynamic> fileUploadProgressStream(File file){
+    try{
+      UploadTask task = storage.ref("${auth.currentUser?.uid}/files").putFile(file);
+      task.resume();
+      StreamController controller = StreamController();
+      StreamSubscription sub = task.snapshotEvents.listen((event) { 
+        controller.add(event);
+      });
+
+      // Cancel the subscription when it's done and add completed true as
+      // Map<String, dynamic>
+      sub.onDone(() {
+        sub.cancel();
+        controller.add({
+          "completed" : "true"
+        });
+      });
+
+      return controller.stream;
+    }catch(e){
+      rethrow;
+    }
+  }
 }
