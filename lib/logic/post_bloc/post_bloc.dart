@@ -15,7 +15,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostLoadingState(
         mode: PostMode.add
       ));
-      await Future.delayed(const Duration(seconds: 4), ()=>{});
+      await Future.delayed(const Duration(seconds: 2), ()=>{});
       emit(NewPostState());
     });
 
@@ -42,6 +42,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     on<NewPostEvent>((event, emit){
       emit(PostInitial(mode: PostMode.add));  
+    });
+
+    on<PostAddImageAttachmentEvent>((event, emit)=>emit(PostShowImageUploadUIState()));
+
+    on<PostUpdatePostContentText>((event, emit){
+      postsRepository.currentPostText = event.postContentText;
+      emit(PostUpdatedContentTextState(newPostContentText: postsRepository.currentPostText!));
     });
   }
 }

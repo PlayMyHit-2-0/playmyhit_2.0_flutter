@@ -16,3 +16,10 @@ final class SavePostEvent extends PostEvent {
 }
 
 final class NewPostEvent extends PostEvent {}
+
+final class PostAddImageAttachmentEvent extends PostEvent {}
+
+final class PostUpdatePostContentText extends PostEvent {
+  final String postContentText;
+  PostUpdatePostContentText({required this.postContentText});
+}

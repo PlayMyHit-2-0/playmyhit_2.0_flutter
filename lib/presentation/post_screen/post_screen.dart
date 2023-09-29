@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +5,10 @@ import 'package:playmyhit/data/enumerations/post_mode.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/presentation/post_screen/default_post_ui/default_post_ui.dart';
+import 'package:playmyhit/presentation/post_screen/new_post_ui/new_post_ui.dart';
+import 'package:playmyhit/presentation/post_screen/post_attach_images_ui.dart';
+import 'package:playmyhit/presentation/post_screen/post_loading_ui.dart';
 
 class PostScreen extends StatelessWidget {
   // The passed in post.
@@ -15,104 +18,9 @@ class PostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController postContentController = TextEditingController();
-
-    Container advertisementUnit() => Container(
-      height: MediaQuery.of(context).size.height * 0.2, //20% of the view's height
-      width: MediaQuery.of(context).size.height * 0.2, // 20% of the view's height
-      color: Colors.black38,
-      child: const Icon(Icons.ad_units)
-    );
-
-    SingleChildScrollView advertisementArea() => SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Sponsored Ads"),
-          Row(
-            children: [
-              advertisementUnit(),
-              advertisementUnit(),
-              advertisementUnit()
-            ]
-          ),
-        ],
-      )
-    );
-
-    SingleChildScrollView newPostUI() => SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          TextField(
-            controller: postContentController,
-            decoration: const InputDecoration(
-              hintText: "Write your post here...",
-              label: Text("Post")
-            ),
-            maxLines: 5,
-            onChanged: (newValue){
-              
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                FloatingActionButton(
-                  heroTag: "AddPhotoButton",
-                  backgroundColor: Colors.red,
-                  mini: true,
-                  onPressed: (){
-          
-                  },
-                  child: const Icon(Icons.add_a_photo)
-                ),
-                const SizedBox(width: 10),
-                FloatingActionButton(
-                  heroTag: "AddVideoButton",
-                  backgroundColor: Colors.red,
-                  mini: true,
-                  onPressed: () {
-
-                  },
-                  child: const Stack(
-                    children: [
-                      Icon(Icons.videocam, size: 34),
-                      Positioned(
-                        top: 7,
-                        left: 4,
-                        child: Icon(Icons.add, size: 20, color: Colors.white)
-                      )
-                    ],
-                  )
-                ),
-                const Spacer(),
-                FloatingActionButton(
-                  heroTag: "SubmitPostButton",
-                  backgroundColor: Colors.redAccent,
-                  mini: true,
-                  child: const Icon(Icons.post_add),
-                  onPressed: () {
-                    Post newPost = Post(
-                      postAttachments: [],
-                      postCreatedAt: Timestamp.fromDate(DateTime.now()),
-                      postId: null,
-                      postImageUrl: null,
-                      postOwnerId: RepositoryProvider.of<PostsRepository>(context).auth.currentUser?.uid,
-                      postText: postContentController.text
-                    );
-                    BlocProvider.of<PostBloc>(context).add(SavePostEvent(post: newPost));
-                  },
-                )
-              ]
-            ),
-          ),
-          advertisementArea()
-        ],
-      ),
-    );
+    
+    // Pull the text from the repo
+    postContentController.text = RepositoryProvider.of<PostsRepository>(context).currentPostText ?? "";
 
     return BlocConsumer<PostBloc, PostState>(
         listenWhen: (previous, current){
@@ -162,30 +70,20 @@ class PostScreen extends StatelessWidget {
                 appBar: AppBar(title: const Text("Existing Post")),
               );
             case NewPostState:
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text("New Post"),
-                ),
-                body: newPostUI()
+            case PostUpdatedContentTextState:
+              return BlocProvider.value(
+                value: BlocProvider.of<PostBloc>(context),
+                child: NewPostUI(postContentController: postContentController)
               );  
             case PostLoadingState :
               PostMode loadingStateMode = (state as PostLoadingState).mode;
-
               late String loadingLabel;
               if(loadingStateMode == PostMode.add){
                 loadingLabel = "Loading";
               }else if(loadingStateMode == PostMode.edit){
                 loadingLabel = "Loading Post";
               }
-
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text(loadingLabel),
-                ),
-                body: const Center(
-                  child: CircularProgressIndicator(),
-                )
-              );
+              return PostLoadingUI(loadingLabel: loadingLabel);
             case PostInitial:
               BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
               return const Scaffold(
@@ -193,13 +91,10 @@ class PostScreen extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 )
               );
+            case PostShowImageUploadUIState:
+              return const PostAttachImagesUi();
             default:
-              return Scaffold(
-                appBar: AppBar(title: const Text("Unknown State")),
-                body: const Center(
-                  child: Text("Unknown State In Post")
-                )
-              );
+              return const DefaultPostUI();
           }
         }
      );

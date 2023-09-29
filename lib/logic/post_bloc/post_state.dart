@@ -31,3 +31,10 @@ final class PostErrorState extends PostActionState {
 }
 
 final class PostSavedState extends PostActionState {}
+
+final class PostShowImageUploadUIState extends PostState {}
+
+final class PostUpdatedContentTextState extends PostState {
+  final String newPostContentText;
+  PostUpdatedContentTextState({required this.newPostContentText});
+}
