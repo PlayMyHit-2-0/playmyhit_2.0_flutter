@@ -51,7 +51,7 @@ class ProfileInfo extends StatelessWidget{
             const SizedBox(height: 20,),
             Row(
               children:[
-                const Text("Intro",
+                const Text("Bio",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   )

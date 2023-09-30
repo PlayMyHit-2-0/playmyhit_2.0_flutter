@@ -15,7 +15,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostLoadingState(
         mode: PostMode.add
       ));
-      await Future.delayed(const Duration(seconds: 2), ()=>{});
+      // await Future.delayed(const Duration(seconds: 2), ()=>{});
       emit(NewPostState());
     });
 
@@ -33,7 +33,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     on<SavePostEvent>((event, emit) async {
       try{
+        // Save the post to firestore
         await postsRepository.savePost(event.post);
+        
+        // Clear the previous post contents
         emit(PostSavedState());
       }catch(e){
         emit(PostErrorState(error: e.toString()));

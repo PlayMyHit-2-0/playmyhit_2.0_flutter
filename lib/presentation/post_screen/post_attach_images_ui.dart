@@ -34,6 +34,12 @@ class PostAttachImagesUi extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
               }
             }
+          ),
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: (){
+              BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
+            },
           )
         ],
       )

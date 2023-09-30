@@ -6,15 +6,47 @@ import 'package:playmyhit/presentation/post_screen/new_post_ui/add_videos_button
 import 'package:playmyhit/presentation/post_screen/new_post_ui/advertisement_area.dart';
 import 'package:playmyhit/presentation/post_screen/new_post_ui/submit_post_button.dart';
 
-class NewPostUI extends StatelessWidget {
+class NewPostUI extends StatefulWidget {
   final TextEditingController postContentController;
 
   const NewPostUI({super.key, required this.postContentController});
+  
+  @override
+  State<StatefulWidget> createState() {
+    return NewPostUIState();
+  }
+}
+
+class NewPostUIState extends State<NewPostUI>{
+
+  bool visible = false;
+
+  @override
+  void initState() {
+    // Start with it hidden
+    visible = false;
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return newPostUI(postContentController: postContentController, context: context);
+     //In 1 second show it
+    Future.delayed(const Duration(milliseconds: 0),(){
+      if(mounted){
+        setState(() {
+          visible = true;
+        }); 
+      }
+    });
+    // return newPostUI(postContentController: widget.postContentController, context: context);
+    return AnimatedOpacity(
+      opacity: visible ? 1 : 0,
+      duration: const Duration(seconds: 1),
+      child: newPostUI(postContentController: widget.postContentController, context: context)
+    );
   }
+
 }
 
 Widget newPostUI(
