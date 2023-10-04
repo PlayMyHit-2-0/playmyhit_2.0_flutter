@@ -42,7 +42,11 @@ class NewPostUIState extends State<NewPostUI>{
     // return newPostUI(postContentController: widget.postContentController, context: context);
     return AnimatedOpacity(
       opacity: visible ? 1 : 0,
+<<<<<<< HEAD
       duration: const Duration(milliseconds: 300),
+=======
+      duration: const Duration(seconds: 1),
+>>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
       child: newPostUI(postContentController: widget.postContentController, context: context)
     );
   }

@@ -17,6 +17,7 @@ final class SavePostEvent extends PostEvent {
 
 final class NewPostEvent extends PostEvent {}
 
+<<<<<<< HEAD
 final class PostAddImageAttachmentEvent extends PostEvent {
 
 }
@@ -24,6 +25,9 @@ final class PostAddImageAttachmentEvent extends PostEvent {
 final class SetPostImageAttachmentEvent extends PostEvent{
   
 }
+=======
+final class PostAddImageAttachmentEvent extends PostEvent {}
+>>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
 
 final class PostUpdatePostContentText extends PostEvent {
   final String postContentText;

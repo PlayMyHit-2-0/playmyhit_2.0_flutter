@@ -65,7 +65,11 @@ class PostsRepository {
     }
   }
 
+<<<<<<< HEAD
   File? postUiImageAttachment;  
+=======
+  File? postUiImageAttachment;
+>>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
   String? currentPostText;
   List<File>? postUiImageAttachments;
 }
