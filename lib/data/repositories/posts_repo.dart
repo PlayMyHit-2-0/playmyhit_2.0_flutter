@@ -65,7 +65,7 @@ class PostsRepository {
     }
   }
 
-  File? postUiImageAttachment;
+  File? postUiImageAttachment;  
   String? currentPostText;
   List<File>? postUiImageAttachments;
 }

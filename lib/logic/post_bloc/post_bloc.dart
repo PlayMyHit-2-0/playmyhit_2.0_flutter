@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:playmyhit/data/enumerations/post_mode.dart';
@@ -47,7 +49,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostInitial(mode: PostMode.add));  
     });
 
-    on<PostAddImageAttachmentEvent>((event, emit)=>emit(PostShowImageUploadUIState()));
+    on<PostAddImageAttachmentEvent>((event, emit)=>emit(PostShowImageUploadUIState(postAttachments: null)));
 
     on<PostUpdatePostContentText>((event, emit){
       postsRepository.currentPostText = event.postContentText;

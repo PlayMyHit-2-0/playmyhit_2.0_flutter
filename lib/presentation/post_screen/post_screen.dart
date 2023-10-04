@@ -11,8 +11,8 @@ import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/default_post_ui/default_post_ui.dart';
 import 'package:playmyhit/presentation/post_screen/new_post_ui/new_post_ui.dart';
-import 'package:playmyhit/presentation/post_screen/post_attach_images_ui.dart';
-import 'package:playmyhit/presentation/post_screen/post_loading_ui.dart';
+import 'package:playmyhit/presentation/post_screen/new_post_ui/attach_image/post_attach_images_ui.dart';
+import 'package:playmyhit/presentation/post_screen/loading_post_ui/post_loading_ui.dart';
 
 class PostScreen extends StatelessWidget {
   // The passed in post.

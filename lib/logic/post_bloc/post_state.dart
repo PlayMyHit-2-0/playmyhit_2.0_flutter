@@ -32,7 +32,10 @@ final class PostErrorState extends PostActionState {
 
 final class PostSavedState extends PostActionState {}
 
-final class PostShowImageUploadUIState extends PostState {}
+final class PostShowImageUploadUIState extends PostState {
+  final List<File>? postAttachments;
+  PostShowImageUploadUIState({required this.postAttachments});
+}
 
 final class PostUpdatedContentTextState extends PostState {
   final String newPostContentText;

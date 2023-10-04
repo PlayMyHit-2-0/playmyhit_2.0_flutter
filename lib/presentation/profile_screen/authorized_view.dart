@@ -64,6 +64,7 @@ class AuthorizedViewState extends State<AuthorizedView> {
                         country : st.settingsDataModel?.country ?? "Unknown Country",
                         intro: st.settingsDataModel?.profileIntroduction ?? "No introduction provided."
                       ),
+                      const SizedBox(height: 5),
                       StreamBuilder(
                         stream: RepositoryProvider.of<PostsRepository>(context).postsStream,
                         builder: (context, snapshot){

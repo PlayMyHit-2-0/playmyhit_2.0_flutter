@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 
 class PostAttachImagesUi extends StatelessWidget {
@@ -27,8 +30,8 @@ class PostAttachImagesUi extends StatelessWidget {
             child: const Text("Select Image"),
             onPressed:(){
               try{
-                ImagePicker().pickImage(source: ImageSource.gallery).then((value) => {
-                  //TODO: Do something with the selected image
+                ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? value) => {
+                  RepositoryProvider.of<PostsRepository>(context).postUiImageAttachment = File(value!.path)
                 });
               }catch(e){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
