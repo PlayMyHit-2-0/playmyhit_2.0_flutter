@@ -49,11 +49,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostInitial(mode: PostMode.add));  
     });
 
-<<<<<<< HEAD
+
     on<PostAddImageAttachmentEvent>((event, emit)=>emit(PostShowImageUploadUIState(postAttachments: null)));
-=======
-    on<PostAddImageAttachmentEvent>((event, emit)=>emit(PostShowImageUploadUIState()));
->>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
 
     on<PostUpdatePostContentText>((event, emit){
       postsRepository.currentPostText = event.postContentText;
