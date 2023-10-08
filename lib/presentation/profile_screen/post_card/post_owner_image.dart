@@ -33,6 +33,7 @@ class PostOwnerImage extends StatelessWidget {
       builder: (context,snapshot){
         if(snapshot.hasData){
           return CircleAvatar(
+            radius: 40,
             backgroundImage: Image.network(snapshot.data as String).image
           );
           // return const Icon(Icons.image);

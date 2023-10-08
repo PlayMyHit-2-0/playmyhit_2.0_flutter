@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 
 class AddVideosButton extends StatelessWidget {
   const AddVideosButton({super.key});
@@ -14,7 +16,7 @@ Widget _addVideosButton(BuildContext context) => FloatingActionButton(
   backgroundColor: Colors.red,
   mini: true,
   onPressed: () {
-
+    BlocProvider.of<PostBloc>(context).add(PostAddVideoAttachmentEvent());
   },
   child: const Stack(
     children: [

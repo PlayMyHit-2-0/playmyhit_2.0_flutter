@@ -1,0 +1,5 @@
+enum PoopometerLayoutDirection {
+  horizontal,
+  vertical
+}
+

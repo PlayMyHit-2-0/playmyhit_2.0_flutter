@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/new_post_ui/add_photos_button.dart';
 import 'package:playmyhit/presentation/post_screen/new_post_ui/add_videos_button.dart';
@@ -42,56 +45,105 @@ class NewPostUIState extends State<NewPostUI>{
     // return newPostUI(postContentController: widget.postContentController, context: context);
     return AnimatedOpacity(
       opacity: visible ? 1 : 0,
-<<<<<<< HEAD
       duration: const Duration(milliseconds: 300),
-=======
-      duration: const Duration(seconds: 1),
->>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
-      child: newPostUI(postContentController: widget.postContentController, context: context)
+      child: newPostUI(postContentController: widget.postContentController, context: context, attachments: RepositoryProvider.of<PostsRepository>(context).postUiImageAttachments)
     );
   }
-
 }
 
 Widget newPostUI(
     {required TextEditingController postContentController,
-    required BuildContext context}) => 
-    Scaffold(
-      appBar: AppBar(
-        title: const Text("New Post"),
+    required BuildContext context, List<File>? attachments}) => 
+  Scaffold(
+    appBar: AppBar(
+      title: const Text("New Post"),
+    ),
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          postContentsLabel,
+          postContentTextField(postContentController, context),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: BlocProvider.value(
+              value: BlocProvider.of<PostBloc>(context),
+              child: const Row(
+                children: [
+                  AddPhotosButton(),
+                  SizedBox(width: 10),
+                  AddVideosButton(),
+                  Spacer(),
+                  SubmitPostButton()
+                ]
+              )
+            ),
+          ),
+          // Images Attachemnts
+          RepositoryProvider.of<PostsRepository>(context).postUiImageAttachments.isNotEmpty ? imagesAttachedLabel : Container(),
+          const SizedBox(height: 8),
+          RepositoryProvider.of<PostsRepository>(context).postUiImageAttachments.isNotEmpty ? attachedImagesList(attachments, context) : Container(),
+          const AdvertisementArea()
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            TextField(
-              controller: postContentController,
-              decoration: const InputDecoration(
-                hintText: "Write your post here...",
-                label: Text("Post")
-              ),
-              maxLines: 5,
-              onChanged: (newValue){
-                BlocProvider.of<PostBloc>(context).add(PostUpdatePostContentText(postContentText: newValue)); 
+    )
+  );
+
+
+Widget attachedImagesList(List<File>? attachments, BuildContext context) => SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: Row(
+    children: attachments?.map((currentImageFile) => SizedBox(
+      width: 100,
+      height: 100,
+      child: Stack(
+        children: [
+          Image.file(currentImageFile),
+          Positioned(
+            right: 10,
+            top: 10,
+            child: FloatingActionButton(
+              backgroundColor: Colors.redAccent,
+              mini: true,
+              onPressed: (){
+                if(kDebugMode){
+                  print("Deleting image.");
+                }
+                BlocProvider.of<PostBloc>(context).add(PostDeleteImageEvent(selectedImage: currentImageFile));
               },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: BlocProvider.value(
-                value: BlocProvider.of<PostBloc>(context),
-                child: const Row(
-                  children: [
-                    AddPhotosButton(),
-                    SizedBox(width: 10),
-                    AddVideosButton(),
-                    Spacer(),
-                    SubmitPostButton()
-                  ]
-                )
-              ),
-            ),
-            const AdvertisementArea()
-          ],
-        ),
+              child: const Icon(Icons.delete)
+            )
+          )
+        ]
       )
-    );
+    )).toList() ?? [
+      const Text("Select an image.")
+    ]
+  )
+);
+
+Widget imagesAttachedLabel = const Row(
+  children: [
+    Text("Images Attached:", textAlign: TextAlign.start,),
+    Spacer(flex: 2),
+  ]
+);
+
+Widget postContentsLabel = const Row(
+  children: [
+    Text("Post Contents:", textAlign: TextAlign.start,),
+    Spacer(flex: 2),
+  ]
+);
+
+Widget postContentTextField(TextEditingController postContentController, BuildContext context) =>  TextField(
+  controller: postContentController,
+  decoration: const InputDecoration(
+    hintText: "Write your post here...",
+    label: Text("Post")
+  ),
+  maxLines: 5,
+  onChanged: (newValue){
+    BlocProvider.of<PostBloc>(context).add(PostUpdatePostContentText(postContentText: newValue)); 
+  },
+);

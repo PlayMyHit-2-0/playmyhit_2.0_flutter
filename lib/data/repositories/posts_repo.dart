@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:core';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -65,11 +65,13 @@ class PostsRepository {
     }
   }
 
-<<<<<<< HEAD
-  File? postUiImageAttachment;  
-=======
-  File? postUiImageAttachment;
->>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
+  //post screen -> add image screen
+  File? postAddImageUiImageAttachment;  
+  List<File> postAddImageUiImageAttachments = [];
+
+  //post_screen
   String? currentPostText;
-  List<File>? postUiImageAttachments;
+  List<File> postUiImageAttachments = [];
+
+
 }

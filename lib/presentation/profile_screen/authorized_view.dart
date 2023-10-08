@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
+import 'package:playmyhit/presentation/profile_screen/action_bar.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/post_card.dart';
 import 'package:playmyhit/presentation/profile_screen/profile_banner.dart';
 import 'package:playmyhit/presentation/profile_screen/profile_info.dart';
@@ -45,7 +46,6 @@ class AuthorizedViewState extends State<AuthorizedView> {
                 //   }
                 // });
                 
-
                 return SingleChildScrollView(
                   child: Column(
                     children: [
@@ -64,6 +64,7 @@ class AuthorizedViewState extends State<AuthorizedView> {
                         country : st.settingsDataModel?.country ?? "Unknown Country",
                         intro: st.settingsDataModel?.profileIntroduction ?? "No introduction provided."
                       ),
+                      const ActionBar(),
                       const SizedBox(height: 5),
                       StreamBuilder(
                         stream: RepositoryProvider.of<PostsRepository>(context).postsStream,

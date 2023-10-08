@@ -39,6 +39,7 @@ dependencies:
   firebase_storage:
   http:
   csc_picker:
+  image_compare:
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -12,6 +12,8 @@ import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/data/repositories/user_data_repo.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_images_bloc/post_images_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_videos_bloc/post_videos_bloc.dart';
 import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/post_screen.dart';
@@ -68,26 +70,33 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers : [
-          BlocProvider<AppStateBlocBloc>(create: (context){
-            return AppStateBlocBloc(
+          BlocProvider<AppStateBlocBloc>(create: (context) => AppStateBlocBloc(
               authRepo: RepositoryProvider.of<AuthenticationRepository>(context),
               userDataRepo: RepositoryProvider.of<UserDataRepo>(context),
-            );
-          }),
-          BlocProvider<SettingsBloc>(create: (context){
-            return SettingsBloc(
+            )
+          ),
+          BlocProvider<SettingsBloc>(create: (context) => SettingsBloc(
               authRepo: RepositoryProvider.of<AuthenticationRepository>(context),
               settingsRepository: RepositoryProvider.of<SettingsRepository>(context),
-            );
-          }),
-          BlocProvider<ProfileBloc>(create: (context) {
-            return ProfileBloc(
+            )
+          ),
+          BlocProvider<ProfileBloc>(create: (context) => ProfileBloc(
               postsRepository: RepositoryProvider.of<PostsRepository>(context),
-            );
-          }),
-          BlocProvider<PostBloc>(create:(context) => PostBloc(
-            postsRepository: RepositoryProvider.of<PostsRepository>(context),
-          ))
+            )
+          ),
+          BlocProvider<PostBloc>(
+            create:(context) => PostBloc(
+              postsRepository: RepositoryProvider.of<PostsRepository>(context),
+            )
+          ),
+          BlocProvider<PostImagesBloc>(
+            create: (context)=>PostImagesBloc(
+              postsRepository: RepositoryProvider.of<PostsRepository>(context)
+            )
+          ),
+          BlocProvider<PostVideosBloc>(
+            create: (context)=>PostVideosBloc(),
+          )
         ],
         child: MaterialApp(
           title: 'PlayMyHit',

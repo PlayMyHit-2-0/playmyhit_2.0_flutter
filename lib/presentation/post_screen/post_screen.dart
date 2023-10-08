@@ -1,23 +1,16 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:playmyhit/data/enumerations/post_mode.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_images_bloc/post_images_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/default_post_ui/default_post_ui.dart';
+import 'package:playmyhit/presentation/post_screen/new_post_ui/attach_video/post_attach_videos_ui.dart';
 import 'package:playmyhit/presentation/post_screen/new_post_ui/new_post_ui.dart';
-<<<<<<< HEAD
 import 'package:playmyhit/presentation/post_screen/new_post_ui/attach_image/post_attach_images_ui.dart';
-import 'package:playmyhit/presentation/post_screen/loading_post_ui/post_loading_ui.dart';
-=======
-import 'package:playmyhit/presentation/post_screen/post_attach_images_ui.dart';
 import 'package:playmyhit/presentation/post_screen/post_loading_ui.dart';
->>>>>>> 8563dce45b28e2f02b79407790e3e04301851445
 
 class PostScreen extends StatelessWidget {
   // The passed in post.
@@ -102,6 +95,8 @@ class PostScreen extends StatelessWidget {
               );
             case PostShowImageUploadUIState:
               return const PostAttachImagesUi();
+            case PostShowVideoUploadUIState:
+              return const PostAttachVideosUi();
             default:
               return const DefaultPostUI();
           }

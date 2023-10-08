@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/logic/post_bloc/post_images_bloc/post_images_bloc.dart';
 
 class PostAttachImagesUi extends StatelessWidget {
   const PostAttachImagesUi({super.key});
@@ -16,40 +18,173 @@ class PostAttachImagesUi extends StatelessWidget {
 
  Widget _attachImageToPostWidget(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text("Add Image")
-    ),
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          // Image.file(
-          //   BlocProvider.of<PostBloc>(context).postsRepository.postUiImageAttachment ?? ,
-          //   errorBuilder: (context, error, stackTrace) => const Icon(Icons.bug_report),
-          // ),
-          _selectedImageFile(context),
-          TextButton(
-            child: const Text("Select Image"),
-            onPressed:(){
-              try{
-                ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? value) => {
-                  RepositoryProvider.of<PostsRepository>(context).postUiImageAttachment = File(value!.path)
-                });
-              }catch(e){
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-              }
-            }
-          ),
-          TextButton(
-            child: const Text("Cancel"),
-            onPressed: (){
-              BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
-            },
-          )
-        ],
+      title: const Text("Add Image"),
+      leading: GestureDetector(
+        child: const Icon(Icons.chevron_left, size: 40),
+        onTap: (){
+          BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
+        },
       )
-    )
-  );
+    ),
+    body: BlocConsumer(
+      bloc: BlocProvider.of<PostImagesBloc>(context),
+      buildWhen: (previous, current){
+        if(current.runtimeType == PostImagesBlocSelectedImageState ||
+           current.runtimeType == PostAddImageLoadingState ||
+           current.runtimeType == PostDeletedImageState ||
+           current.runtimeType == PostImagesBlocInitial
+        ){
+          return true;
+        }else{
+          return false;
+        }
+      },
+      listenWhen: (previous, current){
+        if(current.runtimeType == PostImagesBlocImageAlreadyAddedState || current.runtimeType == PostImagesBlocAttachToPostState){
+          return true;
+        }else{
+          return false;
+        }
+      },
+      builder:(context, state){
+        print("Current Post Images UI State: ");
+        print(state);
+        if(state.runtimeType == PostAddImageLoadingState){
+          if(kDebugMode){
+            print("Loading.....");
+          }
+          return const Center(
+            child: CircularProgressIndicator()
+          );
+        }else if(
+          state.runtimeType == PostImagesBlocSelectedImageState || 
+          state.runtimeType == PostDeletedImageState ||
+          state.runtimeType == PostImagesBlocInitial
+        ){
+          PostImagesBlocState imagesSelectedState;
+          List<File>? attachments;
 
-  Widget _selectedImageFile(BuildContext context) => BlocProvider.of<PostBloc>(context).postsRepository.postUiImageAttachment != null ? Image.file(
-    BlocProvider.of<PostBloc>(context).postsRepository.postUiImageAttachment!,
-    errorBuilder: (context, error, stackTrace) => const Icon(Icons.bug_report),
-  ) : const Icon(Icons.bug_report);
+          // Grab the data depending on which state we have
+          if(state.runtimeType == PostImagesBlocSelectedImageState){
+            imagesSelectedState = state as PostImagesBlocSelectedImageState;
+            attachments = (imagesSelectedState as PostImagesBlocSelectedImageState).selectedImages;
+          }else if(state.runtimeType == PostDeletedImageState){
+            imagesSelectedState = state as PostDeletedImageState;
+            attachments = (imagesSelectedState as PostDeletedImageState).selectedImages;
+          }else if(state.runtimeType == PostImagesBlocInitial){
+            imagesSelectedState = state as PostImagesBlocInitial;
+            attachments = (imagesSelectedState as PostImagesBlocInitial).selectedImages;
+          }
+          
+
+          // Make it happen
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(top: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: attachments?.map((currentImageFile) => SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Stack(
+                        children: [
+                          Image.file(currentImageFile),
+                          Positioned(
+                            right: 10,
+                            top: 10,
+                            child: FloatingActionButton(
+                              backgroundColor: Colors.redAccent,
+                              mini: true,
+                              onPressed: (){
+                                if(kDebugMode){
+                                  print("Deleting image.");
+                                }
+                                BlocProvider.of<PostImagesBloc>(context).add(PostImagesBlocDeleteImageEvent(selectedImage: currentImageFile));
+                              },
+                              child: const Icon(Icons.delete)
+                            )
+                          )
+                        ]
+                      )
+                    )).toList() ?? [
+                      const Text("Select an image.")
+                    ]
+                  )
+                ),
+               
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // TextButton(
+                    //   child: const Text("Cancel"),
+                    //   onPressed: (){
+                    //     BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
+                    //   },
+                    // ),
+                    const SizedBox(width: 30),
+                    TextButton(
+                      child: const Text("Add Image"),
+                      onPressed:(){
+                        try{
+                          ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? value){
+                            RepositoryProvider.of<PostsRepository>(context).postAddImageUiImageAttachment = File(value!.path);
+                            BlocProvider.of<PostImagesBloc>(context).add(PostImagesBlocSelectImageEvent(selectedImage: File(value.path)));
+                          });
+                        }catch(e){
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                        }
+                      }
+                    ),
+                    const SizedBox(width: 30),
+                    TextButton(
+                      child: const Text("Done"),
+                      onPressed: (){
+                        if(kDebugMode){
+                          print("Attaching images to the post.");
+                        }
+
+                        BlocProvider.of<PostImagesBloc>(context).add(PostImagesBlocAttachToPostEvent());
+                      },
+                    ),
+                  ]
+                )
+              ]
+            )
+          );
+        }else{
+          return Center(
+            child: TextButton(
+              child: const Text("Select Image"),
+              onPressed:(){
+                try{
+                  ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? value){
+                    RepositoryProvider.of<PostsRepository>(context).postAddImageUiImageAttachment = File(value!.path);
+                    BlocProvider.of<PostImagesBloc>(context).add(PostImagesBlocSelectImageEvent(selectedImage: File(value.path)));
+                  });
+                }catch(e){
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                }
+              }
+            ),
+          );
+        }
+      }, 
+      listener:(context, state){
+        if(kDebugMode){
+          print("Listener: ");
+          print(state);
+        }
+        if(state.runtimeType == PostImagesBlocImageAlreadyAddedState){
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("The image you tried to add has already been added."))
+          );
+        }else if(state.runtimeType == PostImagesBlocAttachToPostState){
+          print("Sending post bloc initial event from the post attach images ui.");
+          BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
+        }
+      }),
+  );
