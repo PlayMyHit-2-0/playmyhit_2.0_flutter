@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/logic/post_bloc/post_videos_bloc/post_videos_bloc.dart';
 
@@ -30,7 +31,22 @@ class PostAttachVideosUi extends StatelessWidget {
         return false;
       },
       builder:(context, state){
-        return const Text("Attach Video UI");
+        return Column(
+          children: [
+            const SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                // children: RepositoryProvider.of<PostsRepository>(context).postAddVideoUiVideoAttachments?.map((item){
+                //   item.
+                // }).toList() ?? [],
+                children: [],
+              ),
+            ), 
+            TextButton(onPressed: (){
+
+            }, child: const Text("Select Video"))
+          ],
+        );
       }, 
       listener:(context, state){
         

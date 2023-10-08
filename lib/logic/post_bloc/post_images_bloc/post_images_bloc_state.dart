@@ -4,14 +4,14 @@ part of 'post_images_bloc.dart';
 sealed class PostImagesBlocState {}
 
 final class PostImagesBlocInitial extends PostImagesBlocState {
-  final List<File>? selectedImages;
+  final List<Attachment>? selectedImages;
   PostImagesBlocInitial({required this.selectedImages});
 }
 
 abstract class PostImagesBlocActionState extends PostImagesBlocState{}
 
 final class PostImagesBlocSelectedImageState extends PostImagesBlocState {
-  final List<File>? selectedImages;
+  final List<Attachment>? selectedImages;
   PostImagesBlocSelectedImageState({required this.selectedImages});
 }
 
@@ -20,7 +20,7 @@ class PostImagesBlocImageAlreadyAddedState extends PostImagesBlocActionState{}
 class PostAddImageLoadingState extends PostImagesBlocState{}
 
 class PostDeletedImageState extends PostImagesBlocState{
-  final List<File>? selectedImages;
+  final List<Attachment>? selectedImages;
   PostDeletedImageState({required this.selectedImages});
 }
 

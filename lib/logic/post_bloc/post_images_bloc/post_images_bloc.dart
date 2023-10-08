@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_compare/image_compare.dart';
 import 'package:bloc/bloc.dart';
+import 'package:playmyhit/data/enumerations/attachment_type.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 part 'post_images_bloc_event.dart';
 part 'post_images_bloc_state.dart';
@@ -16,44 +18,59 @@ class PostImagesBloc extends Bloc<PostImagesBlocEvent, PostImagesBlocState> {
     });
 
 
-    on<PostImagesBlocSelectImageEvent>((event,emit) async {
+    on<PostImagesBlocSelectImageEvent>((event,emit)  async {
       try{
         File? selectedImage = event.selectedImage;
         bool exists = false;
 
+        print("Emitting loading state from PostImagesBloc");
         emit(PostAddImageLoadingState());
+        
 
-        for (var element in postsRepository.postAddImageUiImageAttachments) {
-          if(await compareImages(src1: element, src2: selectedImage) == 0){
-            emit(PostImagesBlocImageAlreadyAddedState());
+        await Future.delayed(const Duration(milliseconds: 100),() async {
+          for (var element in postsRepository.postAddImageUiImageAttachments) {
+            double val = await compareImages(src1: element.attachmentFile, src2: selectedImage).then((value){
+              if(value == 0){
+                emit(PostImagesBlocImageAlreadyAddedState());
+                emit(PostImagesBlocSelectedImageState(selectedImages: postsRepository.postAddImageUiImageAttachments));
+                exists = true;
+              }
+              return value;
+            });
+            
+            if(val == 0){
+              break;
+            }
+          }
+
+          // If the image has not been added yet, add it
+          if(!exists){
+            if(kDebugMode){
+              print("PostImagesBloc PostImagesBlocSelectImageEvent received.");
+            }
+
+            // If the list of attachments is null, set it to an empty list.
+            if(postsRepository.postAddImageUiImageAttachment == null){
+              postsRepository.postAddImageUiImageAttachments = [];
+            }
+
+            Attachment newImageAttachment = Attachment(
+              selectedImage,
+              attachmentType: AttachmentType.image, attachmentUrl: '', 
+            );
+
+            // Add the selected image to the list of attachments.
+            postsRepository.postAddImageUiImageAttachments.add(newImageAttachment);
+
+            // Show em.
             emit(PostImagesBlocSelectedImageState(selectedImages: postsRepository.postAddImageUiImageAttachments));
-            exists = true;
-            break;
+
+            if(kDebugMode){
+              print("PostImagesBloc emitted PostImagesBlocSelectedImageState");
+            }
           }
-        }
-
-
-        // If the image has not been added yet, add it
-        if(!exists){
-          if(kDebugMode){
-            print("PostImagesBloc PostImagesBlocSelectImageEvent received.");
-          }
-
-          // If the list of attachments is null, set it to an empty list.
-          if(postsRepository.postAddImageUiImageAttachment == null){
-            postsRepository.postAddImageUiImageAttachments = [];
-          }
-
-          // Add the selected image to the list of attachments.
-          postsRepository.postAddImageUiImageAttachments.add(selectedImage);
-
-          // Show em.
-          emit(PostImagesBlocSelectedImageState(selectedImages: postsRepository.postAddImageUiImageAttachments));
-
-          if(kDebugMode){
-            print("PostImagesBloc emitted PostImagesBlocSelectedImageState");
-          }
-        }
+        });
+        
       }catch (error){
          if(kDebugMode){
           print("There was an error while attempting to add the selected image.");
@@ -71,7 +88,7 @@ class PostImagesBloc extends Bloc<PostImagesBlocEvent, PostImagesBlocState> {
         File? selectedImage = event.selectedImage;
 
         //Remove the image from the attachments list
-        postsRepository.postAddImageUiImageAttachments.remove(selectedImage);
+        postsRepository.postAddImageUiImageAttachments.removeWhere((Attachment item)=>item.attachmentFile == selectedImage);
 
 
         //Emit an image deleted state
@@ -93,7 +110,7 @@ class PostImagesBloc extends Bloc<PostImagesBlocEvent, PostImagesBlocState> {
         if(kDebugMode){
           print("Attaching images to the post from the post images bloc.");
         }
-        
+
         // Copy the attachments from the post image ui to the post ui attachments
         postsRepository.postUiImageAttachments = postsRepository.postAddImageUiImageAttachments;
 

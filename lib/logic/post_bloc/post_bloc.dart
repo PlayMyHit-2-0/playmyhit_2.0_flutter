@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:playmyhit/data/enumerations/post_mode.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 
@@ -75,7 +76,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         File? selectedImage = event.selectedImage;
 
         // Remove the image from the post image attachments list in the posts repo
-        postsRepository.postUiImageAttachments.remove(selectedImage);
+        // postsRepository.postUiImageAttachments.remove(selectedImage);
+        postsRepository.postUiImageAttachments.removeWhere((Attachment item)=>item.attachmentFile == selectedImage);
+
 
         // Emit an initial event 
         emit(PostInitial(mode: PostMode.add));

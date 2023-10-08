@@ -31,12 +31,12 @@ class PostErrorState extends PostActionState {
 class PostSavedState extends PostActionState {}
 
 class PostShowImageUploadUIState extends PostState {
-  final List<File>? postAttachments;
+  final List<Attachment>? postAttachments;
   PostShowImageUploadUIState({required this.postAttachments});
 }
 
 class PostShowVideoUploadUIState extends PostState {
-  final List<File>? postAttachments;
+  final List<Attachment>? postAttachments;
   PostShowVideoUploadUIState({required this.postAttachments});
 }
 

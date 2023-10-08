@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/new_post_ui/add_photos_button.dart';
@@ -53,7 +53,7 @@ class NewPostUIState extends State<NewPostUI>{
 
 Widget newPostUI(
     {required TextEditingController postContentController,
-    required BuildContext context, List<File>? attachments}) => 
+    required BuildContext context, List<Attachment>? attachments}) => 
   Scaffold(
     appBar: AppBar(
       title: const Text("New Post"),
@@ -90,33 +90,45 @@ Widget newPostUI(
   );
 
 
-Widget attachedImagesList(List<File>? attachments, BuildContext context) => SingleChildScrollView(
+Widget attachedImagesList(List<Attachment>? attachments, BuildContext context) => SingleChildScrollView(
+  padding: const EdgeInsets.only(left: 8, right: 8),
   scrollDirection: Axis.horizontal,
   child: Row(
-    children: attachments?.map((currentImageFile) => SizedBox(
-      width: 100,
+    children: attachments!.isNotEmpty ? attachments.map((currentImageFile) => Container(
+      margin: const EdgeInsets.only(right: 8),
       height: 100,
       child: Stack(
         children: [
-          Image.file(currentImageFile),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: 100,
+              width: 100,
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: Image.file(currentImageFile.attachmentFile!),
+              ),
+            ),
+          ),
           Positioned(
             right: 10,
             top: 10,
             child: FloatingActionButton(
+              heroTag: currentImageFile.attachmentFile!.path,
               backgroundColor: Colors.redAccent,
               mini: true,
               onPressed: (){
                 if(kDebugMode){
                   print("Deleting image.");
                 }
-                BlocProvider.of<PostBloc>(context).add(PostDeleteImageEvent(selectedImage: currentImageFile));
+                BlocProvider.of<PostBloc>(context).add(PostDeleteImageEvent(selectedImage: currentImageFile.attachmentFile!));
               },
               child: const Icon(Icons.delete)
             )
           )
         ]
       )
-    )).toList() ?? [
+    )).toList() : [
       const Text("Select an image.")
     ]
   )

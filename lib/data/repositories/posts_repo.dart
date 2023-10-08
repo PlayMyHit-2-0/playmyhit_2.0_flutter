@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/models/post.dart';
 
 class PostsRepository {
@@ -67,11 +68,12 @@ class PostsRepository {
 
   //post screen -> add image screen
   File? postAddImageUiImageAttachment;  
-  List<File> postAddImageUiImageAttachments = [];
+  List<Attachment> postAddImageUiImageAttachments = [];
 
   //post_screen
   String? currentPostText;
-  List<File> postUiImageAttachments = [];
+  List<Attachment> postUiImageAttachments = [];
 
-
+  //post screen -> add video screen
+  List<Attachment>? postAddVideoUiVideoAttachments = [];
 }

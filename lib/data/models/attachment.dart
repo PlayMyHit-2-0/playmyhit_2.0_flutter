@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:playmyhit/data/enumerations/attachment_type.dart';
 
 class Attachment {
-  AttachmentType? attachmentType;
+  final AttachmentType? attachmentType;
   String? attachmentUrl;
-  Attachment();
+  late final File? attachmentFile;
 
+  Attachment(File? file,{required this.attachmentType, required this.attachmentUrl}){
+    attachmentFile = file;
+  }
 
   Map<String,dynamic> toJson() => {
     "attachment_type" : attachmentType,

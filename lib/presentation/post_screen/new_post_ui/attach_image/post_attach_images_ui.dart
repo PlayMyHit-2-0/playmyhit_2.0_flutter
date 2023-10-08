@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/logic/post_bloc/post_images_bloc/post_images_bloc.dart';
@@ -47,14 +48,13 @@ class PostAttachImagesUi extends StatelessWidget {
         }
       },
       builder:(context, state){
-        print("Current Post Images UI State: ");
-        print(state);
+        print("CURRENT STATE $state");
         if(state.runtimeType == PostAddImageLoadingState){
           if(kDebugMode){
             print("Loading.....");
           }
           return const Center(
-            child: CircularProgressIndicator()
+            child: Text("Checking Image...")
           );
         }else if(
           state.runtimeType == PostImagesBlocSelectedImageState || 
@@ -62,7 +62,7 @@ class PostAttachImagesUi extends StatelessWidget {
           state.runtimeType == PostImagesBlocInitial
         ){
           PostImagesBlocState imagesSelectedState;
-          List<File>? attachments;
+          List<Attachment>? attachments;
 
           // Grab the data depending on which state we have
           if(state.runtimeType == PostImagesBlocSelectedImageState){
@@ -85,14 +85,25 @@ class PostAttachImagesUi extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SingleChildScrollView(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: attachments?.map((currentImageFile) => SizedBox(
-                      width: 100,
+                    children: attachments!.isNotEmpty ? attachments.map((currentImageFile) => Container(
+                      margin: const EdgeInsets.only(right: 8),
                       height: 100,
                       child: Stack(
                         children: [
-                          Image.file(currentImageFile),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              height: 100,
+                              width: 100,
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: Image.file(currentImageFile.attachmentFile!),
+                              ),
+                            ),
+                          ),
                           Positioned(
                             right: 10,
                             top: 10,
@@ -103,14 +114,14 @@ class PostAttachImagesUi extends StatelessWidget {
                                 if(kDebugMode){
                                   print("Deleting image.");
                                 }
-                                BlocProvider.of<PostImagesBloc>(context).add(PostImagesBlocDeleteImageEvent(selectedImage: currentImageFile));
+                                BlocProvider.of<PostImagesBloc>(context).add(PostImagesBlocDeleteImageEvent(selectedImage: currentImageFile.attachmentFile!));
                               },
                               child: const Icon(Icons.delete)
                             )
                           )
                         ]
                       )
-                    )).toList() ?? [
+                    )).toList() : [
                       const Text("Select an image.")
                     ]
                   )
@@ -119,12 +130,6 @@ class PostAttachImagesUi extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // TextButton(
-                    //   child: const Text("Cancel"),
-                    //   onPressed: (){
-                    //     BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
-                    //   },
-                    // ),
                     const SizedBox(width: 30),
                     TextButton(
                       child: const Text("Add Image"),
