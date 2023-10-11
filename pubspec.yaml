@@ -35,11 +35,13 @@ dependencies:
   bloc:
   flutter_bloc:
   lottie:
-  image_picker:
+  # image_picker:
+  file_picker:
   firebase_storage:
   http:
   csc_picker:
   image_compare:
+  video_player:
 
 
   # The following adds the Cupertino Icons font to your application.

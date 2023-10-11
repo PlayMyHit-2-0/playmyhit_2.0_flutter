@@ -12,8 +12,6 @@ import 'package:playmyhit/data/repositories/settings_repo.dart';
 import 'package:playmyhit/data/repositories/user_data_repo.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
-import 'package:playmyhit/logic/post_bloc/post_images_bloc/post_images_bloc.dart';
-import 'package:playmyhit/logic/post_bloc/post_videos_bloc/post_videos_bloc.dart';
 import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/post_screen.dart';
@@ -89,14 +87,6 @@ class MyApp extends StatelessWidget {
               postsRepository: RepositoryProvider.of<PostsRepository>(context),
             )
           ),
-          BlocProvider<PostImagesBloc>(
-            create: (context)=>PostImagesBloc(
-              postsRepository: RepositoryProvider.of<PostsRepository>(context)
-            )
-          ),
-          BlocProvider<PostVideosBloc>(
-            create: (context)=>PostVideosBloc(),
-          )
         ],
         child: MaterialApp(
           title: 'PlayMyHit',

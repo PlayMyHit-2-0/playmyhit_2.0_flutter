@@ -66,14 +66,6 @@ class PostsRepository {
     }
   }
 
-  //post screen -> add image screen
-  File? postAddImageUiImageAttachment;  
-  List<Attachment> postAddImageUiImageAttachments = [];
-
-  //post_screen
-  String? currentPostText;
-  List<Attachment> postUiImageAttachments = [];
-
-  //post screen -> add video screen
-  List<Attachment>? postAddVideoUiVideoAttachments = [];
+  List<Attachment> postAttachments = [];
+  String currentPostText = "";
 }

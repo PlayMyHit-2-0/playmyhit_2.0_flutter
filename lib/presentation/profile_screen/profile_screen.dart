@@ -83,7 +83,7 @@ class ProfileScreenState extends State<ProfileScreen> {
             destinations: [
               TextButton.icon(
                 onPressed: (){
-                  BlocProvider.of<PostBloc>(context).add(NewPostEvent());
+                  BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
                   Navigator.of(context).pushNamed("/post");
                 }, 
                 icon: const Icon(Icons.post_add),

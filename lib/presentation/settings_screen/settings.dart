@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:csc_picker/csc_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:playmyhit/data/enumerations/profile_visibility.dart';
 import 'package:playmyhit/data/models/user_profile_data_model.dart';
 import 'package:playmyhit/data/repositories/settings_repo.dart';
@@ -84,12 +84,12 @@ class SettingsState extends State<SettingsScreen> {
                     ),
                     onTap: () async {
                       try{
-                        XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        FilePickerResult? image = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
 
                         if(mounted && image != null){
                           BlocProvider.of<SettingsBloc>(context).add(
                             SettingsBlocUpdateImageEvent(
-                              profileImageFile: File(image.path),
+                              profileImageFile: File(image.files.first.path!),
                               imageType: ImageType.profilePicture
                             )
                           );
@@ -199,11 +199,11 @@ class SettingsState extends State<SettingsScreen> {
                   TextButton(
                     onPressed: () async {
                       try{
-                        XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        FilePickerResult? image = await FilePicker.platform.pickFiles(allowMultiple: false, type: FileType.image);
                         if(mounted && image != null){
                           BlocProvider.of<SettingsBloc>(context).add(
                             SettingsBlocUpdateImageEvent(
-                              profileImageFile: File(image.path),
+                              profileImageFile: File(image.files.first.path!),
                               imageType: ImageType.profileBanner
                             )
                           );

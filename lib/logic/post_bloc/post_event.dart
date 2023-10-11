@@ -15,8 +15,6 @@ class SavePostEvent extends PostEvent {
   SavePostEvent({required this.post});
 }
 
-class NewPostEvent extends PostEvent {}
-
 class PostAddImageAttachmentEvent extends PostEvent {}
 
 class PostAddVideoAttachmentEvent extends PostEvent {}
@@ -26,8 +24,15 @@ class PostUpdatePostContentText extends PostEvent {
   PostUpdatePostContentText({required this.postContentText});
 }
 
-class PostDeleteImageEvent extends PostEvent {
-  final File? selectedImage;
-  PostDeleteImageEvent({required this.selectedImage});
+class PostDeleteAttachmentEvent extends PostEvent {
+  final File? selectedAttachmentFile;
+  PostDeleteAttachmentEvent({required this.selectedAttachmentFile});
 }
+
+class PostAttachmentsSelectedEvent extends PostEvent {
+  final List<File> selectedAttachments;
+  final AttachmentType type;
+  PostAttachmentsSelectedEvent({required this.selectedAttachments, required this.type});
+}
+
 

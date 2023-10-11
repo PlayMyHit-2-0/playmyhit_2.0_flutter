@@ -1,15 +1,17 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/enumerations/post_mode.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
-import 'package:playmyhit/logic/post_bloc/post_images_bloc/post_images_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/default_post_ui/default_post_ui.dart';
-import 'package:playmyhit/presentation/post_screen/new_post_ui/attach_video/post_attach_videos_ui.dart';
-import 'package:playmyhit/presentation/post_screen/new_post_ui/new_post_ui.dart';
-import 'package:playmyhit/presentation/post_screen/new_post_ui/attach_image/post_attach_images_ui.dart';
+import 'package:playmyhit/presentation/post_screen/post_ui/post_ui.dart';
 import 'package:playmyhit/presentation/post_screen/post_loading_ui.dart';
 
 class PostScreen extends StatelessWidget {
@@ -22,7 +24,7 @@ class PostScreen extends StatelessWidget {
     TextEditingController postContentController = TextEditingController();
     
     // Pull the text from the repo
-    postContentController.text = RepositoryProvider.of<PostsRepository>(context).currentPostText ?? "";
+    postContentController.text = RepositoryProvider.of<PostsRepository>(context).currentPostText;
 
     return BlocConsumer<PostBloc, PostState>(
         listenWhen: (previous, current){
@@ -30,12 +32,19 @@ class PostScreen extends StatelessWidget {
             return true;
           }else if(current.runtimeType == PostErrorState){
             return true;
+          }else if(current.runtimeType == PostShowImagePickerState){
+            return true;
+          }else if(current.runtimeType == PostShowVideoPickerState){
+            return true;
           }
 
           return false;
         },// Listen when we have an action state
         buildWhen: (previous, current){
-          if(current.runtimeType != PostSavedState && current.runtimeType != PostErrorState){
+          if(current.runtimeType != PostSavedState 
+          && current.runtimeType != PostErrorState
+          && current.runtimeType != PostShowImagePickerState 
+          && current.runtimeType != PostShowVideoPickerState){
             return true;
           }
           return false;
@@ -58,6 +67,32 @@ class PostScreen extends StatelessWidget {
               // Return to the previous screen.
               Navigator.of(context).pop();
               break;
+            case PostShowImagePickerState:
+              try {
+                FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: true).then((result){
+                  if(result != null){
+                    List<File> files = result.files.map((e) => File(e.path!)).toList();
+                    BlocProvider.of<PostBloc>(context).add(PostAttachmentsSelectedEvent(selectedAttachments: files,type: AttachmentType.image));
+                  }
+                });
+              }catch(error){
+                if(kDebugMode){
+                  print(error);
+                }
+              }
+            case PostShowVideoPickerState:
+              try {
+                FilePicker.platform.pickFiles(type: FileType.video, allowMultiple: true).then((result){
+                  if(result != null){
+                    List<File> files = result.files.map((e) => File(e.path!)).toList();
+                    BlocProvider.of<PostBloc>(context).add(PostAttachmentsSelectedEvent(selectedAttachments: files, type: AttachmentType.video));
+                  }
+                });
+              }catch(error){
+                if(kDebugMode){
+                  print(error);
+                }
+              }
             default:
               break;
           }
@@ -71,11 +106,25 @@ class PostScreen extends StatelessWidget {
               return Scaffold(
                 appBar: AppBar(title: const Text("Existing Post")),
               );
-            case NewPostState:
-            case PostUpdatedContentTextState:
+            case PostInitial:
+              List<Attachment> attachedImages = [];
+              List<Attachment> attachedVideos = [];
+              List<Attachment> attachedAudio = [];
+              List<Attachment> attachedPdf = [];
+
+              PostInitial st = state as PostInitial;
+              attachedImages = st.imageAttachments ?? [];
+              attachedVideos = st.videoAttachments ?? [];
+              
               return BlocProvider.value(
                 value: BlocProvider.of<PostBloc>(context),
-                child: NewPostUI(postContentController: postContentController)
+                child: PostUI(
+                  postContentController: postContentController, 
+                  attachedImageFiles: attachedImages,
+                  attachedVideoFiles: attachedVideos,
+                  attachedAudioFiles: attachedAudio,
+                  attachedPdfFiles: attachedPdf,
+                )
               );  
             case PostLoadingState :
               PostMode loadingStateMode = (state as PostLoadingState).mode;
@@ -86,17 +135,6 @@ class PostScreen extends StatelessWidget {
                 loadingLabel = "Loading Post";
               }
               return PostLoadingUI(loadingLabel: loadingLabel);
-            case PostInitial:
-              BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                )
-              );
-            case PostShowImageUploadUIState:
-              return const PostAttachImagesUi();
-            case PostShowVideoUploadUIState:
-              return const PostAttachVideosUi();
             default:
               return const DefaultPostUI();
           }

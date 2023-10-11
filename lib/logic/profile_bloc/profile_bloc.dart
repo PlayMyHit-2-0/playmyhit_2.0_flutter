@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
-import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 
 part 'profile_event.dart';
 part 'profile_state.dart';

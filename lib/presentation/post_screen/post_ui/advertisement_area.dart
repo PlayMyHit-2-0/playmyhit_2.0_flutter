@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:playmyhit/presentation/post_screen/new_post_ui/advertisement_unit.dart';
+import 'package:playmyhit/presentation/post_screen/post_ui/advertisement_unit.dart';
 
 class AdvertisementArea extends StatelessWidget {
   const AdvertisementArea({super.key});

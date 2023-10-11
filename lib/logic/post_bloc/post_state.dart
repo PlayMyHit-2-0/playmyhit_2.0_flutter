@@ -5,7 +5,13 @@ sealed class PostState {}
 
 class PostInitial extends PostState {
   final PostMode mode;
-  PostInitial({required this.mode});
+  // final List<Attachment>? attachments;
+  final List<Attachment>? imageAttachments;
+  final List<Attachment>? videoAttachments;
+  final List<Attachment>? audioAttachments;
+  final List<Attachment>? pdfAttachments;
+  final String? postContentText;
+  PostInitial({required this.mode, required this.imageAttachments, required this.videoAttachments, required this.audioAttachments, required this.pdfAttachments, required this.postContentText});
 }
 
 class PostLoadingState extends PostState {
@@ -18,8 +24,6 @@ class ExistingPostLoadedState extends PostState {
   ExistingPostLoadedState({required this.post});
 }
 
-class NewPostState extends PostState {}
-
 // Action States
 abstract class PostActionState extends PostState {}
 
@@ -30,17 +34,6 @@ class PostErrorState extends PostActionState {
 
 class PostSavedState extends PostActionState {}
 
-class PostShowImageUploadUIState extends PostState {
-  final List<Attachment>? postAttachments;
-  PostShowImageUploadUIState({required this.postAttachments});
-}
+class PostShowVideoPickerState extends PostActionState{}
+class PostShowImagePickerState extends PostActionState{}
 
-class PostShowVideoUploadUIState extends PostState {
-  final List<Attachment>? postAttachments;
-  PostShowVideoUploadUIState({required this.postAttachments});
-}
-
-class PostUpdatedContentTextState extends PostState {
-  final String newPostContentText;
-  PostUpdatedContentTextState({required this.newPostContentText});
-}
