@@ -22,7 +22,7 @@ Widget _submitPostButton(BuildContext context) => FloatingActionButton(
   child: const Icon(Icons.post_add),
   onPressed: () {
     Post newPost = Post(
-      postAttachments: [],
+      postAttachments: RepositoryProvider.of<PostsRepository>(context).postAttachments,
       postCreatedAt: Timestamp.fromDate(DateTime.now()),
       postId: null,
       postImageUrl: null,

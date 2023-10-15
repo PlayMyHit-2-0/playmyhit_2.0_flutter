@@ -127,11 +127,7 @@ Widget attachedVideosList(List<Attachment> attachments, BuildContext context){
           children: attachments.isNotEmpty ? attachments.map((video)=>SizedBox(
             width: 200,
             height: 100,
-            // child: Image.file(
-            //   video.attachmentFile!,
-            //   fit: BoxFit.cover
-            // )
-            child: VideoItem(video: video.attachmentFile!)
+            child: VideoItem(attachment: video,)
           )).toList() : []
         ),
       );

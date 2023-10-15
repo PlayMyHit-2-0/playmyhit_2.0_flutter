@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:playmyhit/data/models/attachment.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VigoVideoPlayer extends StatefulWidget {
-  final File videoFile;
+  final Attachment attachment;
 
-  const VigoVideoPlayer({super.key, required this.videoFile});
+  const VigoVideoPlayer({super.key, required this.attachment});
 
   @override
   State<StatefulWidget> createState() {
@@ -16,7 +18,7 @@ class VigoVideoPlayer extends StatefulWidget {
 
 class VigoVideoPlayerState extends State<VigoVideoPlayer> {
   late VideoPlayerController controller;
-  bool isPlaying = true;
+  bool isPlaying = false;
 
   void checkEndOfVideo() {
     bool endOfVideo = controller.value.isInitialized &&
@@ -29,13 +31,28 @@ class VigoVideoPlayerState extends State<VigoVideoPlayer> {
     }
   }
 
+  String videoTitle() {
+    if(widget.attachment.attachmentFile != null){
+      return widget.attachment.attachmentFile!.path.split('/').last.substring(0,30);
+    }else{
+      // return widget.attachment.attachmentUrl!.split('/').last.substring(0,30);
+      return "";
+    }
+  }
+
   @override
   void initState() {
-    controller = VideoPlayerController.file(widget.videoFile);
+    if(widget.attachment.attachmentFile != null){
+      controller = VideoPlayerController.file(widget.attachment.attachmentFile!);
+    }else{
+      controller = VideoPlayerController.networkUrl(Uri.parse(widget.attachment.attachmentUrl!));
+    }
+
     controller.initialize();
+    controller.setLooping(true);
     controller.addListener(checkEndOfVideo);
-    isPlaying = true;
-    controller.play();
+    isPlaying = false;
+    // controller.play();
     super.initState();
   }
 
@@ -48,50 +65,64 @@ class VigoVideoPlayerState extends State<VigoVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Column(
-              children: [
-                Text("${widget.videoFile.path.split('/').last.substring(0,30)}..."),
-                SizedBox(
-                  width: double.maxFinite,
-                  height: 300,
-                  child: AspectRatio(aspectRatio: 1.0,child: VideoPlayer(
-                    controller,
-                  )),
-                ),
-                TextButton(onPressed: (){
-                  Navigator.of(context).pop(); // Close the dialog
-                }, child: const Text("Close"))
-              ],
-            ),
-            Positioned(
-              child: IconButton(
-                color: const Color.fromARGB(100, 255, 255, 255),
-                iconSize: 100,
-                icon: isPlaying ? const Icon(Icons.stop) : const Icon(Icons.play_arrow),
-                onPressed: (){
-                  if(isPlaying){
-                    setState(() {
-                      isPlaying = false;
-                      controller.pause();
-                    });
-                  }else{
-                    setState(() {
-                      isPlaying = true;
-                      controller.play();
-                    });
-                  }
-                },
+    return VisibilityDetector(
+      key: Key(widget.attachment.hashCode.toString()),
+      onVisibilityChanged: (info){
+        double visiblePercentage = info.visibleFraction * 100;
+        if(visiblePercentage < 0.5){
+          // When the video goes off screen by 50%
+          setState((){
+            // Pause the video
+            isPlaying = false;
+            controller.pause();
+          });
+        }
+      },
+      child: SingleChildScrollView(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Column(
+                children: [
+                  Text(videoTitle()),
+                  SizedBox(
+                    width: double.maxFinite,
+                    height: 400,
+                    child: AspectRatio(aspectRatio: 1.0,child: VideoPlayer(
+                      controller,
+                    )),
+                  ),
+                  // TextButton(onPressed: (){
+                  //   Navigator.of(context).pop(); // Close the dialog
+                  // }, child: const Text("Close"))
+                ],
               ),
-            )
-          ],
-        ),
-      )
+              Positioned(
+                child: IconButton(
+                  color: const Color.fromARGB(100, 255, 255, 255),
+                  iconSize: 100,
+                  icon: isPlaying ? const Icon(Icons.stop) : const Icon(Icons.play_arrow),
+                  onPressed: (){
+                    if(isPlaying){
+                      setState(() {
+                        isPlaying = false;
+                        controller.pause();
+                      });
+                    }else{
+                      setState(() {
+                        isPlaying = true;
+                        controller.play();
+                      });
+                    }
+                  },
+                ),
+              )
+            ],
+          ),
+        )
+      ),
     );
   }
 }

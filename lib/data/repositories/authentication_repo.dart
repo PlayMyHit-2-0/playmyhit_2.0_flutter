@@ -12,17 +12,17 @@ class AuthenticationRepository {
     
 
     Future<AuthenticationRequestResponse> attemptLogin(String email, String password) async {
-      print("Recieved login authentication request in the authentication repository.");
+      // print("Recieved login authentication request in the authentication repository.");
       try {
         AuthenticationRequestResponse loginRequest = AuthenticationRequestResponse(
           exception: null,
           credentials: await auth.signInWithEmailAndPassword(email: email, password: password)
         );
-        print("Processed login request returning login rquest to the bloc");
+        // print("Processed login request returning login rquest to the bloc");
 
         return Future.value(loginRequest);
       }on FirebaseAuthException catch  (e) {
-        print("Recieved an error while attempting to login from the authentication repository.");
+        // print("Recieved an error while attempting to login from the authentication repository.");
         print(e.code);
         AuthenticationRequestResponse loginRequest = AuthenticationRequestResponse(
           exception: e,
@@ -30,7 +30,7 @@ class AuthenticationRepository {
         );
         return Future.value(loginRequest);
       } catch (e){
-        print("Recieved unknown error while attempting to login from the authentication repository.");
+        // print("Recieved unknown error while attempting to login from the authentication repository.");
         AuthenticationRequestResponse loginRequest = AuthenticationRequestResponse(
           exception: FirebaseAuthException(message: e.toString(), code: 'unknown-error-found'),
           credentials: null
@@ -58,16 +58,16 @@ class AuthenticationRepository {
     }
 
     Future<Map<String, dynamic>> sendRecoveryEmail(String email) async {
-      print("Sending recovery email from the authentication repo.");
+      // print("Sending recovery email from the authentication repo.");
       try {
         await auth.sendPasswordResetEmail(email: email);
-        print("Authentication recovery email sent from the authentication repo.");
+        // print("Authentication recovery email sent from the authentication repo.");
         return {
           "success" : true,
           "error" : null
         };
       } on FirebaseAuthException catch (e){ 
-        print("Error found while attempting to send recovery email through the authentication repo.");
+        // print("Error found while attempting to send recovery email through the authentication repo.");
         print(e.code);
         // throw Exception(e.toString());
         return {

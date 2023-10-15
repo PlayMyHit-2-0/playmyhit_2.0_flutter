@@ -2,7 +2,10 @@ part of 'post_bloc.dart';
 
 sealed class PostEvent {}
 
-class PostInitialEvent extends PostEvent {}
+class PostInitialEvent extends PostEvent {
+  final PostMode postMode;
+  PostInitialEvent({required this.postMode});
+}
 
 class LoadPostEvent extends PostEvent{
   final String postId;
@@ -33,6 +36,11 @@ class PostAttachmentsSelectedEvent extends PostEvent {
   final List<File> selectedAttachments;
   final AttachmentType type;
   PostAttachmentsSelectedEvent({required this.selectedAttachments, required this.type});
+}
+
+class PostVideoLoadingEvent extends PostEvent {
+  final String status;
+  PostVideoLoadingEvent({required this.status});
 }
 
 

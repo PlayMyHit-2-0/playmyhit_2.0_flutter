@@ -3,21 +3,24 @@ import 'dart:io';
 import 'package:playmyhit/data/enumerations/attachment_type.dart';
 
 class Attachment {
-  final AttachmentType? attachmentType;
+  AttachmentType? attachmentType;
   String? attachmentUrl;
-  late final File? attachmentFile;
+  File? attachmentFile;
 
   Attachment(File? file,{required this.attachmentType, required this.attachmentUrl}){
     attachmentFile = file;
   }
 
   Map<String,dynamic> toJson() => {
-    "attachment_type" : attachmentType,
+    "attachment_type" : attachmentType.toString(),
     "attachment_url" : attachmentUrl ?? ""
   };
 
-  Attachment.fromJson(Map<String, dynamic> json)
-      : attachmentType = json['attachment_type'],
-        attachmentUrl = json['attachment_url'];
+  Attachment.fromJson(Map<String, dynamic> json){
+    AttachmentType type = AttachmentType.values.where((at)=>at.toString() == json['attachment_type']).first;
+    // print("Attachment type: ${type.name}");
+    attachmentType = type;
+    attachmentUrl = json['attachment_url'];
+  }
 
 }

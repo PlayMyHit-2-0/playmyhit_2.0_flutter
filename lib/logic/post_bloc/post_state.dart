@@ -37,3 +37,9 @@ class PostSavedState extends PostActionState {}
 class PostShowVideoPickerState extends PostActionState{}
 class PostShowImagePickerState extends PostActionState{}
 
+class PostVideoLoadingState extends PostState{
+  final String status;
+  PostVideoLoadingState({required this.status});
+}
+
+class PostFilesUploadingState extends PostState {}

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -14,11 +15,16 @@ import 'package:playmyhit/presentation/post_screen/default_post_ui/default_post_
 import 'package:playmyhit/presentation/post_screen/post_ui/post_ui.dart';
 import 'package:playmyhit/presentation/post_screen/post_loading_ui.dart';
 
-class PostScreen extends StatelessWidget {
+class PostScreen extends StatefulWidget {
   // The passed in post.
   final Post? post;
   const PostScreen({super.key, required this.post});
 
+  @override
+  State<PostScreen> createState() => _PostScreenState();
+}
+
+class _PostScreenState extends State<PostScreen> {
   @override
   Widget build(BuildContext context) {
     TextEditingController postContentController = TextEditingController();
@@ -69,7 +75,7 @@ class PostScreen extends StatelessWidget {
               break;
             case PostShowImagePickerState:
               try {
-                FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: true).then((result){
+                FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: true,).then((result){
                   if(result != null){
                     List<File> files = result.files.map((e) => File(e.path!)).toList();
                     BlocProvider.of<PostBloc>(context).add(PostAttachmentsSelectedEvent(selectedAttachments: files,type: AttachmentType.image));
@@ -82,7 +88,9 @@ class PostScreen extends StatelessWidget {
               }
             case PostShowVideoPickerState:
               try {
-                FilePicker.platform.pickFiles(type: FileType.video, allowMultiple: true).then((result){
+                FilePicker.platform.pickFiles(type: FileType.video, allowMultiple: true, onFileLoading: (FilePickerStatus status){
+                  BlocProvider.of<PostBloc>(context).add(PostVideoLoadingEvent(status: status.name));
+                }).then((result){
                   if(result != null){
                     List<File> files = result.files.map((e) => File(e.path!)).toList();
                     BlocProvider.of<PostBloc>(context).add(PostAttachmentsSelectedEvent(selectedAttachments: files, type: AttachmentType.video));
@@ -135,6 +143,44 @@ class PostScreen extends StatelessWidget {
                 loadingLabel = "Loading Post";
               }
               return PostLoadingUI(loadingLabel: loadingLabel);
+            case PostVideoLoadingState:
+              String status = (state as PostVideoLoadingState).status;
+              return Scaffold(
+                appBar: AppBar(title: const Text("Loading")),
+                body: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Text(status == "picking" ? "Loading Selected Videos" : status)
+                    ),
+                    const SizedBox(height: 20,),
+                    const CircularProgressIndicator()
+                  ]
+                )
+              );
+            case PostFilesUploadingState:
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text("Uploading Files"),
+                ),
+                body: SingleChildScrollView(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("Uploading Attached Files..."),
+                          SizedBox(height: 8),
+                          CircularProgressIndicator()
+                        ]
+                      ),
+                    ),
+                  )
+                )
+              );
             default:
               return const DefaultPostUI();
           }

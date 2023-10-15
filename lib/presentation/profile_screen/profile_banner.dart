@@ -20,7 +20,8 @@ class ProfileBanner extends StatelessWidget {
           width: MediaQuery.of(context).size.width,
           child: Image.network(
             profileBannerUrl,
-            fit: BoxFit.cover
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => const CircularProgressIndicator(),
           ),
         ),
         Positioned(
@@ -31,7 +32,8 @@ class ProfileBanner extends StatelessWidget {
               height: 140,
               width: 140,
               child: CircleAvatar(
-                backgroundImage: Image.network(profilePictureUrl).image
+                backgroundImage: Image.network(profilePictureUrl).image,
+                onBackgroundImageError: (exception, stackTrace) => const CircularProgressIndicator(),
               ),
             )
           ),

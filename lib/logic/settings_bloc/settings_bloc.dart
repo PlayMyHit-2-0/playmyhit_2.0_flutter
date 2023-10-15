@@ -79,12 +79,12 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
           }
 
           if(kDebugMode){
-            print("Retrieving new user profile data model");
+            // print("Retrieving new user profile data model");
           }
 
           UserProfileDataModel? settingsDataModel = await settingsRepository.getUserProfileDataModel();
           if(kDebugMode){
-            print("Retrieved new user profile data model: ");
+            // print("Retrieved new user profile data model: ");
             print(settingsDataModel);
           }
           if(settingsDataModel == null){
@@ -96,7 +96,7 @@ class SettingsBloc extends Bloc<SettingsBlocEvent, SettingsBlocState> {
         });
       }catch(e){
         if(kDebugMode){
-          print("Found an error while attempting to update the ${imageType.toString()} image from the Settings Bloc.");
+          // print("Found an error while attempting to update the ${imageType.toString()} image from the Settings Bloc.");
           print(e.toString());
         }
 

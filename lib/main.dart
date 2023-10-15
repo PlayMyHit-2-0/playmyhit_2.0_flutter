@@ -34,7 +34,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     // late AppStateBlocBloc appStateBloc = AppStateBlocBloc(authRepo: RepositoryProvider.of<AuthenticationRepository>(context));
@@ -78,13 +77,14 @@ class MyApp extends StatelessWidget {
               settingsRepository: RepositoryProvider.of<SettingsRepository>(context),
             )
           ),
-          BlocProvider<ProfileBloc>(create: (context) => ProfileBloc(
-              postsRepository: RepositoryProvider.of<PostsRepository>(context),
-            )
-          ),
           BlocProvider<PostBloc>(
             create:(context) => PostBloc(
               postsRepository: RepositoryProvider.of<PostsRepository>(context),
+            )
+          ),
+          BlocProvider<ProfileBloc>(create: (context) => ProfileBloc(
+              postsRepository: RepositoryProvider.of<PostsRepository>(context),
+              postsBloc: BlocProvider.of<PostBloc>(context)
             )
           ),
         ],

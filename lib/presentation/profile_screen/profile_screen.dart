@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:playmyhit/data/enumerations/post_mode.dart';
 import 'package:playmyhit/logic/app_state_bloc/app_state_bloc_bloc.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 import 'package:playmyhit/presentation/profile_screen/authorized_view.dart';
 import 'package:playmyhit/presentation/profile_screen/unauthorized_view.dart';
@@ -51,6 +53,11 @@ class ProfileScreenState extends State<ProfileScreen> {
         },
         child: Scaffold(
           appBar: AppBar(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(30),
+              ),
+            ),
             leading: Container(),
             title: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? const Text("My Profile") : const Text("Unauthorized"),
             actions: [
@@ -77,25 +84,27 @@ class ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           body: BlocProvider.of<AppStateBlocBloc>(context).authRepo.currentUser != null ? 
-            AuthorizedView(bloc: settingsBloc) :
+            AuthorizedView(settingsBloc: settingsBloc, profileBloc: BlocProvider.of<ProfileBloc>(context)) :
             const UnauthorizedView(),
-          bottomNavigationBar: NavigationBar(
+          bottomNavigationBar: ClipRRect(
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+            child: NavigationBar(
             destinations: [
               TextButton.icon(
                 onPressed: (){
-                  BlocProvider.of<PostBloc>(context).add(PostInitialEvent());
+                  BlocProvider.of<PostBloc>(context).add(PostInitialEvent(postMode: PostMode.add));
                   Navigator.of(context).pushNamed("/post");
                 }, 
-                icon: const Icon(Icons.post_add),
-                label: const Text("New Post"),
+                icon: const Icon(Icons.post_add, color: Colors.white),
+                label: const Text("New Post", style: TextStyle(color: Colors.white)),
               ),
               TextButton.icon(
                 onPressed: (){}, 
-                icon: const Icon(Icons.messenger),
-                label : const Text("Messages")
+                icon: const Icon(Icons.messenger, color: Colors.white),
+                label : const Text("Messages", style: TextStyle(color: Colors.white))
               )
             ],
-          ),
+          )),
         ),
       ),
     );

@@ -8,3 +8,5 @@ final class LoadPeerProfileEvent extends ProfileEvent {
   final String uid;
   LoadPeerProfileEvent({required this.uid});
 }
+
+final class ScrollToTopEvent extends ProfileEvent {}

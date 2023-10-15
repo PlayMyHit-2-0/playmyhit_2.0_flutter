@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/enumerations/post_mode.dart';
@@ -17,7 +20,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   PostBloc({required this.postsRepository}) : super(PostInitial(mode: PostMode.add, imageAttachments: null, videoAttachments: null, audioAttachments: null, pdfAttachments: null, postContentText: null)) {
     on<PostInitialEvent>((event, emit) async {
       emit(PostLoadingState(
-        mode: PostMode.add
+        mode: event.postMode
       ));
 
       // Clear out the post attachments
@@ -29,18 +32,66 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     on<SavePostEvent>((event, emit) async {
       try{
-        // Save the post to firestore
-        await postsRepository.savePost(event.post);
+        // Show the loader
+        emit(PostFilesUploadingState());
+
+        // Upload the attached files
+        for(Attachment attachment in event.post.postAttachments ?? []){
+          // await postsRepository.fileUploadProgressStream(attachment.attachmentFile!).listen((event) { }).asFuture();
+          UploadTask task = postsRepository.storage.ref("${postsRepository.auth.currentUser?.uid}/files/${attachment.attachmentFile?.path.split('/').last}").putFile(attachment.attachmentFile!);
+          await task;
+          attachment.attachmentUrl = await task.snapshot.ref.getDownloadURL();
+        }
+
+        // Clear out the files
+        for(Attachment att in event.post.postAttachments ?? []){
+          //Clear the file
+          att.attachmentFile = null;
+        }
         
-        // Clear the previous post contents
+        // Save the post
+        await postsRepository.savePost(event.post);
         emit(PostSavedState());
+
       }catch(e){
+        print(e);
         emit(PostErrorState(error: e.toString()));
+      }
+    });
+
+    on<PostUpdatePostContentText>((event,emit){
+      try{ 
+         // Filter the list of attachments for images only
+        List<Attachment> imageAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.image).toList();
+
+        // Fileter the list of attachments for videos only
+        List<Attachment> videoAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.video).toList();
+
+        // Fileter the list of attachments for audio files only
+        List<Attachment> audioAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.audio).toList();
+
+        // Fileter the list of attachments for pdf files only
+        List<Attachment> pdfAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.pdf).toList();
+
+        postsRepository.currentPostText = event.postContentText;
+        
+        emit(PostInitial(
+          mode: postsRepository.postMode,
+          imageAttachments: imageAttachments,
+          videoAttachments: videoAttachments,
+          audioAttachments: audioAttachments,
+          pdfAttachments: pdfAttachments,
+          postContentText: postsRepository.currentPostText
+        ));
+      }catch(error){
+        emit(PostErrorState(error: error.toString()));
       }
     });
 
     on<PostDeleteAttachmentEvent>((event, emit){
       try {
+        emit(PostLoadingState(mode: postsRepository.postMode));
+
         // Grab the selected image from the event
         File? selectedImage = event.selectedAttachmentFile;
 
@@ -64,7 +115,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         
         // Emit an initial event 
         emit(PostInitial(
-          mode: PostMode.add,
+          mode: postsRepository.postMode,
           imageAttachments: imageAttachments, 
           videoAttachments: videoAttachments, 
           audioAttachments: audioAttachments, 
@@ -90,6 +141,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     });
 
     on<PostAttachmentsSelectedEvent>((event, emit){
+      emit(PostLoadingState(mode: postsRepository.postMode));
+
       // Convert selected images to a list of Attachment
       List<File> selectedAttachments = event.selectedAttachments;
       List<Attachment> attachments = [];
@@ -123,7 +176,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
       // Emit a images selected state
       emit(PostInitial(
-        mode: PostMode.add,
+        mode: postsRepository.postMode,
         imageAttachments: imageAttachments, 
         videoAttachments: videoAttachments,
         audioAttachments: audioAttachments, 
@@ -131,6 +184,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         postContentText: postContentText
         )
       );
+    });
+
+    on<PostVideoLoadingEvent>((event,emit){
+      emit(PostVideoLoadingState(status: event.status));
     });
   }
 }

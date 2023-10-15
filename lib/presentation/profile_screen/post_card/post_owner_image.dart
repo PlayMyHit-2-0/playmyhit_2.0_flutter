@@ -13,8 +13,8 @@ class PostOwnerImage extends StatelessWidget {
       Map<String,dynamic> postOwnerSettings = await RepositoryProvider.of<PostsRepository>(context).getPostOwnerSettings(postOwnerId);
       String postOwnerProfileImageUrl = postOwnerSettings["settings"]["profileImageUrl"];
       if(kDebugMode){
-        print("Retrieving profile image url for the post owner with id $postOwnerId");
-        print("Profile Image Url Retrieved: $postOwnerProfileImageUrl");
+        // print("Retrieving profile image url for the post owner with id $postOwnerId");
+        // print("Profile Image Url Retrieved: $postOwnerProfileImageUrl");
       }
       return postOwnerProfileImageUrl;
     }catch(e){

@@ -17,3 +17,5 @@ final class ProfileErrorState extends ProfileActionState {
   final String error;
   ProfileErrorState({required this.error});
 }
+
+final class ProfileScrollToTopState extends ProfileActionState {}
