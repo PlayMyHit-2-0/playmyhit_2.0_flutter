@@ -10,3 +10,5 @@ final class LoadPeerProfileEvent extends ProfileEvent {
 }
 
 final class ScrollToTopEvent extends ProfileEvent {}
+
+final class NavigateToMusicPageEvent extends ProfileEvent{}

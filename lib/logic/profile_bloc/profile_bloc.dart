@@ -35,6 +35,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileScrollToTopState());
     });
 
+    on<NavigateToMusicPageEvent>((event, emit){
+      emit(NavigateToMusicPageState());
+    });
+
 
     
     postsStateSubscription = postsBloc.stream.listen((st) {

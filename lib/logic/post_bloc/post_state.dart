@@ -36,6 +36,7 @@ class PostSavedState extends PostActionState {}
 
 class PostShowVideoPickerState extends PostActionState{}
 class PostShowImagePickerState extends PostActionState{}
+class PostShowAudioPickerState extends PostActionState{}
 
 class PostVideoLoadingState extends PostState{
   final String status;

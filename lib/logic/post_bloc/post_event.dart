@@ -22,6 +22,8 @@ class PostAddImageAttachmentEvent extends PostEvent {}
 
 class PostAddVideoAttachmentEvent extends PostEvent {}
 
+class PostAddAudioAttachmentEvent extends PostEvent {}
+
 class PostUpdatePostContentText extends PostEvent {
   final String postContentText;
   PostUpdatePostContentText({required this.postContentText});

@@ -42,6 +42,8 @@ class _PostScreenState extends State<PostScreen> {
             return true;
           }else if(current.runtimeType == PostShowVideoPickerState){
             return true;
+          }else if(current.runtimeType == PostShowAudioPickerState){
+            return true;
           }
 
           return false;
@@ -50,14 +52,15 @@ class _PostScreenState extends State<PostScreen> {
           if(current.runtimeType != PostSavedState 
           && current.runtimeType != PostErrorState
           && current.runtimeType != PostShowImagePickerState 
-          && current.runtimeType != PostShowVideoPickerState){
+          && current.runtimeType != PostShowVideoPickerState
+          && current.runtimeType != PostShowAudioPickerState){
             return true;
           }
           return false;
         }, // And build when we have a regular state
         listener: (context, state) {
           if(kDebugMode){
-            print(state.runtimeType);
+            print("PostListener: ${state.runtimeType}");
           }
           switch(state.runtimeType){
             case PostErrorState : // When we throw an error
@@ -86,6 +89,7 @@ class _PostScreenState extends State<PostScreen> {
                   print(error);
                 }
               }
+              break;
             case PostShowVideoPickerState:
               try {
                 FilePicker.platform.pickFiles(type: FileType.video, allowMultiple: true, onFileLoading: (FilePickerStatus status){
@@ -101,6 +105,41 @@ class _PostScreenState extends State<PostScreen> {
                   print(error);
                 }
               }
+              break;
+            case PostShowAudioPickerState:
+              try{
+                FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['mp3', 'aac', 'wav'], 
+                  allowMultiple: true, 
+                  onFileLoading: (FilePickerStatus status){
+                    // BlocProvider.of<PostBloc>(context).ad
+                    if(kDebugMode){
+                      print("Loading selected audio files..");
+                    }
+                  }
+                ).then((result){
+                  if(result != null){
+                    List<File> files = result.files.map((e) => File(e.path!)).toList();
+
+                    if(kDebugMode){
+                      print("Audio files selected:");
+                      print("${files.length}");
+                    }
+
+                    BlocProvider.of<PostBloc>(context).add(PostAttachmentsSelectedEvent(selectedAttachments: files, type: AttachmentType.audio));
+                  }else{
+                    if(kDebugMode){
+                      print("The results of picking audio files was empty.");
+                    }
+                  }
+                });
+              }catch(error){
+                if(kDebugMode){
+                  print(error);
+                }
+              }
+              break;
             default:
               break;
           }
@@ -123,6 +162,7 @@ class _PostScreenState extends State<PostScreen> {
               PostInitial st = state as PostInitial;
               attachedImages = st.imageAttachments ?? [];
               attachedVideos = st.videoAttachments ?? [];
+              attachedAudio = st.audioAttachments ?? [];
               
               return BlocProvider.value(
                 value: BlocProvider.of<PostBloc>(context),

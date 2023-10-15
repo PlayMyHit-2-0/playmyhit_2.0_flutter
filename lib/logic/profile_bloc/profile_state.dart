@@ -19,3 +19,5 @@ final class ProfileErrorState extends ProfileActionState {
 }
 
 final class ProfileScrollToTopState extends ProfileActionState {}
+
+final class NavigateToMusicPageState extends ProfileActionState {}

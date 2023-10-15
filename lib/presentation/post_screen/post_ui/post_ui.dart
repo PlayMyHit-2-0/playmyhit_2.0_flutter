@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
+import 'package:playmyhit/presentation/common_widgets/music_item.dart';
 import 'package:playmyhit/presentation/common_widgets/video_item.dart';
+import 'package:playmyhit/presentation/post_screen/post_ui/add_music_button.dart';
 import 'package:playmyhit/presentation/post_screen/post_ui/add_photos_button.dart';
 import 'package:playmyhit/presentation/post_screen/post_ui/add_videos_button.dart';
 import 'package:playmyhit/presentation/post_screen/post_ui/advertisement_area.dart';
@@ -99,6 +102,8 @@ Widget postUI(
                   AddPhotosButton(),
                   SizedBox(width: 10),
                   AddVideosButton(),
+                  SizedBox(width: 10),
+                  AddMusicButton(),
                   Spacer(),
                   SubmitPostButton()
                 ]
@@ -106,17 +111,46 @@ Widget postUI(
             ),
           ),
           // Images Attachemnts
-          RepositoryProvider.of<PostsRepository>(context).postAttachments.isNotEmpty ? imagesAttachedLabel : Container(),
+          // RepositoryProvider.of<PostsRepository>(context).postAttachments.isNotEmpty ? imagesAttachedLabel : Container(),
           const SizedBox(height: 8),
           imageAttachments != null ? attachedImagesList(imageAttachments, context) : Container(),
           const SizedBox(height: 8),
           videoAttachments != null ? attachedVideosList(videoAttachments, context) : Container(),
-          const AdvertisementArea()
+          const SizedBox(height: 8),
+          audioAttachments != null ? attachedAudioList(audioAttachments, context) : Container(),
+          const SizedBox(height: 8),
+          // Text(audioAttachments?.length.toString() ?? "audioAttachments null"),
+          const AdvertisementArea(),
+
         ],
       ),
     )
   );
 
+Widget attachedAudioList(List<Attachment> attachments, BuildContext context){
+  if(attachments.isNotEmpty){
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: attachments.isNotEmpty ? attachments.map((audio)=>Container(
+          margin: const EdgeInsets.only(right: 8),
+          // width:/,
+          height: 50,
+          child: MusicItem(
+            inList: false,
+            thumbnailUrl: null,
+            fileUrl: audio.attachmentUrl,
+            name: "${audio.attachmentFile?.path.split("/").last.substring(0,15)}...",
+            audioFile: audio.attachmentFile,
+          )
+        )).toList() : []
+      )
+    );
+  }else{
+    return const Text("No audio attached.");
+  }
+}
 
 Widget attachedVideosList(List<Attachment> attachments, BuildContext context){
     if(attachments.isNotEmpty){
@@ -175,7 +209,7 @@ Widget attachedImagesList(List<Attachment>? attachments, BuildContext context) =
         ]
       )
     )).toList() : [
-      const Text("Select an image.")
+      const Text("No images attached.")
     ]
   )
 );

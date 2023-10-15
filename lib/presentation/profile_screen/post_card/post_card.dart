@@ -7,6 +7,7 @@ import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/presentation/common_widgets/video_item.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/like_dislike_gesture_ui/like_dislike_gesture_ui.dart';
+import 'package:playmyhit/presentation/profile_screen/post_card/post_audio.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/post_images.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/post_owner_image.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/post_videos.dart';
@@ -95,6 +96,17 @@ Widget postContainer(String username,Post post, AnimationController? fireOpacity
                     Text(username, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     Text(flipDate(post.postCreatedAt!.toDate().toString().split(".").first.replaceAll("-", "/")), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300))
                   ]
+                ),
+                const Spacer(flex: 1),
+                FloatingActionButton(
+                  heroTag: post.hashCode,
+                  mini: true,
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.redAccent,
+                  child: const Icon(Icons.delete),
+                  onPressed: (){
+                    print("Call bloc logic to delete this post.");
+                  },
                 )
               ]
             ),
@@ -129,6 +141,12 @@ Widget postContainer(String username,Post post, AnimationController? fireOpacity
             width: MediaQuery.of(context).size.width,
             // child: VideoItem()
             child: PostVideos(post: post)
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            height: post.postAttachments!.where((element)=> element.attachmentType == AttachmentType.audio).isNotEmpty ? 50 : 0,
+            width: MediaQuery.of(context).size.width,
+            child: PostAudio(post: post)
           ),
           Container(
             padding: const EdgeInsets.all(8),

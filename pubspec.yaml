@@ -43,6 +43,7 @@ dependencies:
   image_compare:
   video_player:
   visibility_detector:
+  just_audio:
 
 
   # The following adds the Cupertino Icons font to your application.

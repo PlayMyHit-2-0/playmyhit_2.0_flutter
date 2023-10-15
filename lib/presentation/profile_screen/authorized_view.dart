@@ -81,7 +81,15 @@ class AuthorizedViewState extends State<AuthorizedView> {
                             country : st.settingsDataModel?.country ?? "Unknown Country",
                             intro: st.settingsDataModel?.profileIntroduction ?? "No introduction provided."
                           ),
-                          const ActionBar(),
+                          BlocListener(
+                            bloc: BlocProvider.of<ProfileBloc>(context),
+                            listener :(context, state){
+                              if(state.runtimeType == NavigateToMusicPageState){
+                                Navigator.of(context).pushNamed("/music");
+                              }
+                            },
+                            child: BlocProvider.value(value: BlocProvider.of<ProfileBloc>(context), child: const ActionBar()),
+                          ),
                           const SizedBox(height: 5),
                           StreamBuilder(
                             stream: RepositoryProvider.of<PostsRepository>(context).postsStream,

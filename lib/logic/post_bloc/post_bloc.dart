@@ -93,11 +93,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         emit(PostLoadingState(mode: postsRepository.postMode));
 
         // Grab the selected image from the event
-        File? selectedImage = event.selectedAttachmentFile;
+        File? selectedAttachment = event.selectedAttachmentFile;
 
         // Remove the image from the post image attachments list in the posts repo
         // postsRepository.postUiImageAttachments.remove(selectedImage);
-        postsRepository.postAttachments.removeWhere((Attachment item)=>item.attachmentFile == selectedImage);
+        postsRepository.postAttachments.removeWhere((Attachment item)=>item.attachmentFile == selectedAttachment);
 
         // Filter the list of attachments for images only
         List<Attachment> imageAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.image).toList();
@@ -140,6 +140,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostShowVideoPickerState());
     });
 
+    on<PostAddAudioAttachmentEvent>((event, emit){
+      emit(PostShowAudioPickerState());
+    });
+
     on<PostAttachmentsSelectedEvent>((event, emit){
       emit(PostLoadingState(mode: postsRepository.postMode));
 
@@ -161,11 +165,6 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       // Fileter the list of attachments for videos only
       List<Attachment> videoAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.video).toList();
 
-      if(kDebugMode){
-        print("Attached Videos: ");
-        print(videoAttachments);
-      }
-
       // Fileter the list of attachments for audio files only
       List<Attachment> audioAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.audio).toList();
 
@@ -173,6 +172,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       List<Attachment> pdfAttachments = postsRepository.postAttachments.where((item)=>item.attachmentType == AttachmentType.pdf).toList();
 
       String postContentText = postsRepository.currentPostText;
+      
+      if(kDebugMode){
+        print("From the post bloc, audio attachment selected");
+        print("${audioAttachments.length}");
+        print(audioAttachments);
+      }
 
       // Emit a images selected state
       emit(PostInitial(

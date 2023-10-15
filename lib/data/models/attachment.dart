@@ -6,6 +6,8 @@ class Attachment {
   AttachmentType? attachmentType;
   String? attachmentUrl;
   File? attachmentFile;
+  String? attachmentThumbnailUrl;
+  String? attachmentTitle;
 
   Attachment(File? file,{required this.attachmentType, required this.attachmentUrl}){
     attachmentFile = file;
