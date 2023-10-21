@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:playmyhit/data/models/post.dart';
-import 'package:playmyhit/data/repositories/posts_repo.dart';
-import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 import 'package:playmyhit/presentation/profile_screen/action_bar.dart';

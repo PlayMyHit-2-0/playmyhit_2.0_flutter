@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:playmyhit/data/models/attachment.dart';
-import 'package:playmyhit/presentation/common_widgets/music_item.dart';
 
 class MyPicturesScreen extends StatelessWidget{
   final List<Attachment> myPicturePostAttachments;

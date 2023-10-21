@@ -5,7 +5,6 @@ import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/enumerations/poopometer_layout_direction.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/data/repositories/posts_repo.dart';
-import 'package:playmyhit/presentation/common_widgets/video_item.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/like_dislike_gesture_ui/like_dislike_gesture_ui.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/post_audio.dart';
 import 'package:playmyhit/presentation/profile_screen/post_card/post_images.dart';

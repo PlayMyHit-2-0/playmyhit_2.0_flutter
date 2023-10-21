@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/data/models/attachment.dart';
-import 'package:playmyhit/data/repositories/posts_repo.dart';
 import 'package:playmyhit/logic/post_bloc/post_bloc.dart';
 import 'package:playmyhit/presentation/common_widgets/music_item.dart';
 import 'package:playmyhit/presentation/common_widgets/video_item.dart';

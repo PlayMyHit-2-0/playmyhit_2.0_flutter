@@ -1,8 +1,6 @@
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/presentation/profile_screen/music_screen/discover_music_screen.dart';
