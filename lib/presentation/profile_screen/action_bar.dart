@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
@@ -22,8 +23,12 @@ class ActionBar extends StatelessWidget {
               IconButton(icon: const Icon(Icons.music_note, color: Colors.redAccent), onPressed:(){
                 BlocProvider.of<ProfileBloc>(context).add(NavigateToMusicPageEvent());
               }),
-              IconButton(icon: const Icon(Icons.videocam, color: Colors.redAccent), onPressed:(){}),
-              IconButton(icon: const Icon(Icons.image, color: Colors.redAccent), onPressed:() {}),
+              IconButton(icon: const Icon(Icons.videocam, color: Colors.redAccent), onPressed:(){
+                BlocProvider.of<ProfileBloc>(context).add(NavigateToVideosPageEvent());
+              }),
+              IconButton(icon: const Icon(Icons.image, color: Colors.redAccent), onPressed:() {
+                BlocProvider.of<ProfileBloc>(context).add(NavigateToPicturesPageEvent());
+              }),
               IconButton(icon: const Icon(Icons.stacked_line_chart, color: Colors.redAccent), onPressed: (){}),
               const Spacer(flex: 1),
               const Badge(

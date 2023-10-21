@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/models/post.dart';
 import 'package:playmyhit/presentation/common_widgets/vigo_video_player.dart';
-import 'package:video_player/video_player.dart';
 
 class PostVideos extends StatelessWidget{
   final Post post;

@@ -1,22 +1,23 @@
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/models/attachment.dart';
 import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/presentation/profile_screen/music_screen/discover_music_screen.dart';
 import 'package:playmyhit/presentation/profile_screen/music_screen/friends_music_screen.dart';
 import 'package:playmyhit/presentation/profile_screen/music_screen/my_music_screen.dart';
+import 'package:playmyhit/presentation/profile_screen/videos_screen/discover_videos_screen.dart';
+import 'package:playmyhit/presentation/profile_screen/videos_screen/friends_videos_screen.dart';
+import 'package:playmyhit/presentation/profile_screen/videos_screen/my_videos_screen.dart';
 
-class MusicScreen extends StatefulWidget{
-  const MusicScreen({super.key});
+class VideosScreen extends StatefulWidget{
+  const VideosScreen({super.key});
 
   @override
-  State<MusicScreen> createState() => _MusicScreenState();
+  State<VideosScreen> createState() => _VideosScreenState();
 }
 
-class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStateMixin{
+class _VideosScreenState extends State<VideosScreen> with SingleTickerProviderStateMixin{
   late TabController controller;
 
   @override
@@ -48,10 +49,10 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
       },
       builder: (context, state){
         switch(state.runtimeType){
-          case NavigateToMusicPageState:
-            NavigateToMusicPageState st = state as NavigateToMusicPageState;
-            List<Attachment> myMusicAttachments = st.myMusicAttachments;
-            return mainUi(controller, context,myMusicAttachments);
+          case NavigateToVideosPageState:
+            NavigateToVideosPageState st = state as NavigateToVideosPageState;
+            List<Attachment> myVideoAttachments = st.myVideoAttachments;
+            return mainUi(controller, context,myVideoAttachments);
           default: return Scaffold(
             appBar: AppBar(
               title: const Text("Unknown State")
@@ -68,14 +69,14 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
 
 
 
-Widget mainUi(TabController controller, BuildContext context, List<Attachment> myMusicAttachments) => Scaffold(
+Widget mainUi(TabController controller, BuildContext context, List<Attachment> myVideoAttachments) => Scaffold(
   appBar: AppBar(
-    title: const Text("Music"),
+    title: const Text("Videos"),
     bottom: TabBar(
       controller: controller,
       tabs: const [
-        Tab(icon: Icon(Icons.person), text: "My Music"),
-        Tab(icon: Icon(Icons.people), text: "Friends Music"),
+        Tab(icon: Icon(Icons.person), text: "My Videos"),
+        Tab(icon: Icon(Icons.people), text: "Friends Videos"),
         Tab(icon: Icon(Icons.explore), text: "Discover"),
       ],
     ),
@@ -84,9 +85,9 @@ Widget mainUi(TabController controller, BuildContext context, List<Attachment> m
     controller: controller,
       children: [
         // MyMusciView(myMusicPostAttachments: myMusicAttachments);
-        MyMusicScreen(myMusicPostAttachments: myMusicAttachments),
-        const FriendsMusicScreen(),
-        const DiscoverMusicScreen()
+        MyVideosScreen(myVideoPostAttachments: myVideoAttachments),
+        const FriendsVideosScreen(),
+        const DiscoverVideosScreen()
       ],
     ),
   );    

@@ -9,8 +9,9 @@ import 'package:video_player/video_player.dart';
 
 class VideoItem extends StatefulWidget {
     final Attachment attachment;
+    final bool inList;
 
-    const VideoItem({required this.attachment, super.key});
+    const VideoItem({required this.attachment, super.key, required this.inList});
 
     @override
     State<StatefulWidget> createState() {
@@ -75,7 +76,7 @@ class VideoItemState extends State<VideoItem> {
         backgroundColor: Colors.black
       ),
     ),
-    trailing: FloatingActionButton(
+    trailing: widget.inList ? const SizedBox(width: 0,height: 0,) : FloatingActionButton(
       mini: true,
       backgroundColor: Colors.redAccent,
       child: const Icon(Icons.delete),

@@ -20,4 +20,17 @@ final class ProfileErrorState extends ProfileActionState {
 
 final class ProfileScrollToTopState extends ProfileActionState {}
 
-final class NavigateToMusicPageState extends ProfileActionState {}
+final class NavigateToMusicPageState extends ProfileActionState {
+  final List<Attachment> myMusicAttachments;
+  NavigateToMusicPageState({required this.myMusicAttachments});
+}
+
+final class NavigateToVideosPageState extends ProfileActionState {
+  final List<Attachment> myVideoAttachments;
+  NavigateToVideosPageState({required this.myVideoAttachments});
+}
+
+final class NavigateToPicturesPageState extends ProfileActionState {
+  final List<Attachment> myPictureAttachments;
+  NavigateToPicturesPageState({required this.myPictureAttachments});
+}

@@ -71,11 +71,13 @@ class VigoVideoPlayerState extends State<VigoVideoPlayer> {
         double visiblePercentage = info.visibleFraction * 100;
         if(visiblePercentage < 0.5){
           // When the video goes off screen by 50%
-          setState((){
-            // Pause the video
-            isPlaying = false;
-            controller.pause();
-          });
+          if(mounted){
+            setState((){
+              // Pause the video
+              isPlaying = false;
+              controller.pause();
+            });
+          }
         }
       },
       child: SingleChildScrollView(
@@ -106,15 +108,19 @@ class VigoVideoPlayerState extends State<VigoVideoPlayer> {
                   icon: isPlaying ? const Icon(Icons.stop) : const Icon(Icons.play_arrow),
                   onPressed: (){
                     if(isPlaying){
-                      setState(() {
-                        isPlaying = false;
-                        controller.pause();
-                      });
+                      if(mounted){
+                        setState(() {
+                          isPlaying = false;
+                          controller.pause();
+                        });
+                      }
                     }else{
-                      setState(() {
-                        isPlaying = true;
-                        controller.play();
-                      });
+                      if(mounted){
+                        setState(() {
+                          isPlaying = true;
+                          controller.play();
+                        });
+                      }
                     }
                   },
                 ),

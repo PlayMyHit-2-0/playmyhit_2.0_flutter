@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ProfileBanner extends StatelessWidget {
@@ -18,11 +19,17 @@ class ProfileBanner extends StatelessWidget {
         SizedBox(
           height: 250,
           width: MediaQuery.of(context).size.width,
-          child: Image.network(
-            profileBannerUrl,
+          // child: Image.network(
+          //   profileBannerUrl,
+          //   fit: BoxFit.cover,
+          //   errorBuilder: (context, error, stackTrace) => const CircularProgressIndicator(),
+          // ),
+          child: CachedNetworkImage(
+            imageUrl: profileBannerUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => const CircularProgressIndicator(),
-          ),
+            placeholder: (context, url) => const CircularProgressIndicator(color: Colors.redAccent),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          )
         ),
         Positioned(
           top: 30,

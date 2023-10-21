@@ -32,6 +32,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     on<SavePostEvent>((event, emit) async {
       try{
+        Post p = event.post;
         // Show the loader
         emit(PostFilesUploadingState());
 
@@ -44,17 +45,19 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         }
 
         // Clear out the files
-        for(Attachment att in event.post.postAttachments ?? []){
+        for(Attachment att in p.postAttachments ?? []){
           //Clear the file
           att.attachmentFile = null;
         }
         
         // Save the post
-        await postsRepository.savePost(event.post);
+        await postsRepository.savePost(p);
         emit(PostSavedState());
 
       }catch(e){
-        print(e);
+        if(kDebugMode){
+          print(e);
+        }
         emit(PostErrorState(error: e.toString()));
       }
     });

@@ -16,8 +16,10 @@ import 'package:playmyhit/logic/profile_bloc/profile_bloc.dart';
 import 'package:playmyhit/logic/settings_bloc/settings_bloc.dart';
 import 'package:playmyhit/presentation/post_screen/post_screen.dart';
 import 'package:playmyhit/presentation/profile_screen/music_screen/music_screen.dart';
+import 'package:playmyhit/presentation/profile_screen/pictures_screen/pictures_screen.dart';
 import 'package:playmyhit/presentation/profile_screen/profile_screen.dart';
 import 'package:playmyhit/presentation/login_screen/login_screen.dart';
+import 'package:playmyhit/presentation/profile_screen/videos_screen/videos_screen.dart';
 import 'package:playmyhit/presentation/recovery_screen/recovery_screen.dart';
 import 'package:playmyhit/presentation/registration_screen/registration_screen.dart';
 import 'package:playmyhit/presentation/registration_screen/username_selection_screen.dart';
@@ -121,7 +123,9 @@ class MyApp extends StatelessWidget {
             "/dashboard" : (context) => const ProfileScreen(),
             "/settings" : (context) => const SettingsScreen(),
             "/post" : (context) => const PostScreen(post: null),
-            "/music" : (context) => const MusicScreen()
+            "/music" : (context) => const MusicScreen(),
+            "/videos" : (context) => const VideosScreen(),
+            "/pictures" : (context) => const PicturesScreen()
           }
         ),
       )

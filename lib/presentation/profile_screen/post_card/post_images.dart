@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:playmyhit/data/enumerations/attachment_type.dart';
 import 'package:playmyhit/data/models/post.dart';
@@ -16,9 +17,14 @@ class PostImages extends StatelessWidget {
           (element) => element.attachmentType == AttachmentType.image)
           .map((e)=>ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.network(
-              e.attachmentUrl ?? "",
-              errorBuilder:(context, error, stackTrace) => const CircularProgressIndicator(),
+            // child: Image.network(
+            //   e.attachmentUrl ?? "",
+            //   errorBuilder:(context, error, stackTrace) => const CircularProgressIndicator(),
+            // )
+            child: CachedNetworkImage(
+              imageUrl: e.attachmentUrl!,
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              placeholder: (context, url) => const CircularProgressIndicator(),
             )
           ))
           .toList() as List<Widget>,

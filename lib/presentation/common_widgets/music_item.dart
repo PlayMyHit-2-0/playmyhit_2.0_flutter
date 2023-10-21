@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +32,7 @@ class _MusicItemState extends State<MusicItem> {
         if(kDebugMode){
           print("Initializing audio file from a url");
         }
-        
+
         player.setUrl(widget.fileUrl!).then(
           (value){
             setState(() {
@@ -39,17 +40,20 @@ class _MusicItemState extends State<MusicItem> {
             });
           }
         );
+
+        player.setLoopMode(LoopMode.all);
       }else if(widget.audioFile != null){
         if(kDebugMode){
           print("Initializing audio file from system memory.");
         }
 
-      player.setFilePath(widget.audioFile!.path).then((value){
-        setState(() {
-          audioDuration = value;
+        player.setFilePath(widget.audioFile!.path).then((value){
+          setState(() {
+            audioDuration = value;
+          });
         });
-      });
 
+        player.setLoopMode(LoopMode.all);
       }else{
         isError = true;
       }
@@ -99,7 +103,7 @@ class _MusicItemState extends State<MusicItem> {
       leading: Icon(Icons.error),
     ) : Row(
         children:[
-          Image.network(widget.thumbnailUrl ?? defaultThumbnailUrl),
+          CachedNetworkImage(imageUrl: widget.thumbnailUrl ?? defaultThumbnailUrl),
           const SizedBox(width: 8),
           Text(widget.name ?? "Untitled Track"),
           TextButton.icon(
@@ -129,7 +133,7 @@ class _MusicItemState extends State<MusicItem> {
                 }
               },
             ),
-            TextButton.icon(
+            widget.inList ? Container() : TextButton.icon(
               label: const Text(""),
               icon :const Icon(Icons.delete, color: Colors.redAccent),
               onPressed: (){

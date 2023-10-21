@@ -161,7 +161,7 @@ Widget attachedVideosList(List<Attachment> attachments, BuildContext context){
           children: attachments.isNotEmpty ? attachments.map((video)=>SizedBox(
             width: 200,
             height: 100,
-            child: VideoItem(attachment: video,)
+            child: VideoItem(attachment: video, inList: false,)
           )).toList() : []
         ),
       );
@@ -231,8 +231,15 @@ Widget postContentsLabel = const Row(
 Widget postContentTextField(TextEditingController postContentController, BuildContext context) =>  TextField(
   controller: postContentController,
   decoration: const InputDecoration(
+    fillColor: Colors.redAccent,
     hintText: "Write your post here...",
-    label: Text("Post")
+    label: Text("Post"),
+    enabledBorder: UnderlineInputBorder(      
+      borderSide: BorderSide(color: Colors.redAccent),   
+    ),  
+    focusedBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: Colors.redAccent),
+    ),  
   ),
   maxLines: 5,
   onChanged: (newValue){
